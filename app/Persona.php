@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Persona extends Model
 {
     protected $primaryKey = 'id_persona';
-    public $timestamps = false;
 
     /**
      * Get the User record associated with the Person.

@@ -6,7 +6,7 @@
     <div class="mytop-content" >
         <div class="container" > 
           
-                <div class="col-sm-12 " style="background-color:rgba(0, 0, 0, 0.35); height: 60px; " >
+                <div class="col-sm-12" style="background-color:#296dc0; height: 60px;">
                    {{-- <a class="mybtn-social pull-right" href="{{ url('/register') }}">
                        Register
                   </a> --}}
@@ -17,20 +17,11 @@
                
                 </div>
             
-            <div class="row">
-              <div class="col-sm-6 col-sm-offset-3 myform-cont" >
-                
-
-                     <div class="myform-top">
-                        <div class="myform-top-left">
-                           <img  src="{{ url('img/minculturas_logo.png') }}" class="img-responsive logo" />
-                          <h3>Regístrate en nuestro sitio.</h3>
-                            <p>Por favor ingresa tus datos personales:</p>
-                        </div>
-                        <div class="myform-top-right">
-                          <i class="fa fa-user"></i>
-                        </div>
-                      </div>
+                <div class="row">
+                  <div class="col-sm-6 col-sm-offset-3 myform-cont" >
+                        <div class="myform-top-login">
+                          <br>
+                          <img  src="{{ url('img/avatar.png') }} " class="img-responsive myform-img-top-center"/>
 
                   <div class="col-md-12" >
                     @if (count($errors) > 0)
@@ -47,7 +38,7 @@
                     @endif
                    </div  >
 
-                    <div class="myform-bottom">
+                    <div class="myform-bottom-login">
                       
                       <form role="form" action="{{ url('/register') }}" method="post" class="">
                       <input type="hidden" name="_token" value="{{ csrf_token() }}">

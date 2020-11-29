@@ -6,10 +6,10 @@
     <div class="mytop-content" >
         <div class="container" >
 
-            <div class="col-sm-12" style="background-color:#296dc0; height: 60px; " >
-              <a class="mybtn-social pull-right" href="{{ url('/login') }}">
+            <div class="col-sm-12" style="background-color:#296dc0; height: 60px;">
+              {{-- <a class="mybtn-social pull-right" href="{{ url('/login') }}">
                   Login
-              </a>
+              </a> --}}
 
               <a class="mybtn-social pull-right" href="{{ url('/register') }}">
                   Registro
@@ -51,7 +51,7 @@
                       <form role="form" action="{{ url('/login') }}" method="post" >
                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="form-group">
-                            <input type="text" name="email" value="{{ old('email') }}" placeholder="nombre" class="form-control" id="form-username">
+                            <input type="text" name="email" value="{{ old('email') }}" placeholder="Nombre" class="form-control" id="form-username">
                         </div>
                         <div class="form-group">
                             <input type="password" name="password" placeholder="Clave" class="form-control" id="form-password">

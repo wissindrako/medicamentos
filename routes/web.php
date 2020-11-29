@@ -44,9 +44,6 @@ Route::group(['middleware' => 'auth'], function () {
 
 
     Route::get('form_agregar_persona', 'PersonasController@form_agregar_persona');
-
-
-    Route::get('form_agregar_persona', 'PersonasController@form_agregar_persona');
     Route::post('agregar_persona', 'PersonasController@agregar_persona');
 
     Route::get('form_editar_persona/{id_persona}', 'PersonasController@form_editar_persona');

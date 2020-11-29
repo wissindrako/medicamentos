@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ValidacionPersona;
 use Illuminate\Support\Facades\Validator;
 use Datatables;
 use DateTime;
@@ -11,14 +12,7 @@ use Image;
 use Auth;
 use App\User;
 use App\Persona;
-use App\Recinto;
-use App\Mesa;
-use App\UsuarioMesa;
-use App\UsuarioRecinto;
-use App\UsuarioDistrito;
-use App\UsuarioCircunscripcion;
-use App\UsuarioTransporte;
-use App\UsuarioCasaCampana;
+
 
 class PersonasController extends Controller
 {
@@ -26,638 +20,92 @@ class PersonasController extends Controller
     public function form_agregar_persona(){
         //carga el formulario para agregar un nueva persona
 
-        if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-            return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
+
+
+        if (Auth::guest()) {
+            $roles = \DB::table('roles')
+            ->where('id', '>', 1)
+            ->get();
+        } else {
+            $roles = \DB::table('roles')->get();
         }
-
-        $circunscripciones = \DB::table('recintos')
-        ->select('circunscripcion')
-        ->distinct()
-        ->orderBy('circunscripcion', 'asc')
-        ->get();
-
-        $origenes = \DB::table('origen')
-        ->where('activo', 1)
-        ->get();
-
-        $roles = \DB::table('roles')
-        ->where('id', '>=', 15)
-        ->get();
-
-        $casas =  \DB::table('casas_campana')
-        ->where('casas_campana.activo', 1)
-        ->orderBy('circunscripcion', 'asc')
-        ->orderBy('distrito', 'asc')
-        ->orderBy('id_casa_campana', 'asc')
-        ->get();
-
-        $vehiculos = \DB::table('transportes')
-        ->where('transportes.activo', 1)
-        ->orderBy('id_transporte', 'asc')
-        ->get();
-
-        $evidencias = \DB::table('tipo_evidencias')
-        ->where('estado', 1)
-        ->orderBy('id')
-        ->get();
 
 
         return view("formularios.form_agregar_persona")
-        ->with('circunscripciones', $circunscripciones)
-        ->with('origenes', $origenes)
-        ->with('roles', $roles)
-        ->with('casas', $casas)
-        ->with('vehiculos', $vehiculos)
-        ->with('evidencias', $evidencias);
+        ->with('roles', $roles);
     }
 
-    public function agregar_persona(Request $request){
+    public function agregar_persona(ValidacionPersona $request){
 
-        if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-            return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        }
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
+        $foto = "";
 
-        $circunscripciones_listado = \DB::table('recintos')
-        ->select('circunscripcion')
-        ->distinct()
-        ->orderBy('circunscripcion', 'asc')
-        ->get();
+        if($request->file('archivo') != ""){
+            $tiempo_actual = new DateTime(date('Y-m-d H:i:s'));
+            $archivo = $request->file('archivo');
+            $mime = $archivo->getMimeType();
+            $extension=strtolower($archivo->getClientOriginalExtension());
 
-        $origenes_listado = \DB::table('origen')
-        ->where('activo', 1)
-        ->get();
+            $nuevo_nombre=$request->input("cedula_identidad")."-".$tiempo_actual->getTimestamp();
 
-        $roles_listado = \DB::table('roles')
-        ->where('id', '>=', 15)
-        ->get();
+            $file = $request->file('archivo');
 
-        $casas_listado =  \DB::table('casas_campana')
-        ->where('casas_campana.activo', 1)
-        ->orderBy('circunscripcion', 'asc')
-        ->orderBy('distrito', 'asc')
-        ->orderBy('id_casa_campana', 'asc')
-        ->get();
-
-        $vehiculos_listado = \DB::table('transportes')
-        ->where('transportes.activo', 1)
-        ->orderBy('id_transporte', 'asc')
-        ->get();
-
-        $evidencias_listado = \DB::table('tipo_evidencias')
-        ->where('estado', 1)
-        ->orderBy('id')
-        ->get();
-
-        if($request->input("nombres") == ''){
-            return 'nombres';
-        }elseif($request->input("nacimiento") == ''){
-            return 'nacimiento';
-        }elseif ($request->input("telefono") == '') {
-            return 'telefono';
-        // }elseif ($request->input("direccion") == '') {
-        //     return 'direccion';
-        // }elseif ($request->input("grado_compromiso") == '') {
-        //     return 'grado_compromiso';
-        }elseif ($request->input("id_origen") == '') {
-            return 'origen';
-        }elseif ($request->input("id_sub_origen") == '') {
-            return 'Sub Origen';
-        }elseif ($request->input("titularidad") == '') {
-            return 'titularidad';
-        // }elseif ($request->input("informatico") == '') {
-        //     return 'informatico';
-        }elseif ($request->input("recinto") == '') {
-            return 'recinto';
-        }elseif ($request->input("rol_slug") == '') {
-            return 'rol';
-        }elseif($request->input("rol_slug") == 'conductor' && $request->input("id_vehiculo") == ""){
-            return "id_vehiculo";
-        }elseif ($request->input("rol_slug") == 'registrador' && $request->input("id_casa_campana") == "") {
-            return "id_casa_campana";
-        }elseif ($request->input("rol_slug") == 'responsable_mesa' && !$request->has("mesas")) {
-            return "mesas";
-        }elseif ($request->input("rol_slug") == 'responsable_recinto' && $request->input("recinto") == "") {
-            return "recinto";
-        }elseif ($request->input("rol_slug") == 'responsable_distrito' && $request->input("recinto") == "") {
-            return "recinto";
-        }elseif ($request->input("rol_slug") == 'responsable_circunscripcion' && $request->input("recinto") == "") {
-            return "recinto";
-        }else{}
+            $image = Image::make($file->getRealPath());
             
-        $reglas=[ 
-            'archivo'  => 'mimes:jpg,jpeg,gif,png,bmp | max:2048000'
-            ];
-            
-        $mensajes=[
-        'archivo.mimes' => 'El archivo debe ser un archivo con formato: jpg, jpeg, gif, png, bmp',
-        'archivo.max' => 'El archivo Supera el tamaño máximo permitido',
-        ];
+            //reducimos la calidad y cambiamos la dimensiones de la nueva instancia.
+            $image->resize(1280, null, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+            });
+            $image->orientate();
 
-        $validator = Validator::make( $request->all(),$reglas,$mensajes );
-        if( $validator->fails() ){ 
-            $circunscripciones = \DB::table('recintos')
+            $rutadelaimagen="../storage/media/fotos/".$nuevo_nombre;
 
-            ->select('circunscripcion')
-            ->distinct()
-            ->orderBy('circunscripcion', 'asc')
-            ->get();
-    
-            $origenes = \DB::table('origen')
-            ->where('activo', 1)
-            ->get();
-    
-            $roles = \DB::table('roles')
-            ->where('id', '>=', 15)
-            ->get();
-    
-            $casas =  \DB::table('casas_campana')
-            ->where('casas_campana.activo', 1)
-            ->orderBy('circunscripcion', 'asc')
-            ->orderBy('distrito', 'asc')
-            ->orderBy('id_casa_campana', 'asc')
-            ->get();
-    
-            $vehiculos = \DB::table('transportes')
-            ->where('transportes.activo', 1)
-            ->orderBy('id_transporte', 'asc')
-            ->get();
-    
-            $evidencias = \DB::table('tipo_evidencias')
-            ->where('estado', 1)
-            ->orderBy('id')
-            ->get();
-    
-    
-            return view("formularios.form_agregar_persona")
-            ->with('circunscripciones', $circunscripciones)
-            ->with('origenes', $origenes)
-            ->with('roles', $roles)
-            ->with('casas', $casas)
-            ->with('vehiculos', $vehiculos)
-            ->with('evidencias', $evidencias)
-            ->withErrors($validator)
-            ->withInput($request->flash());
-        }
+            if ($image->save($rutadelaimagen)){
+                $foto=$rutadelaimagen;
 
-        $cedulas = \DB::table('personas')
-        ->select('cedula_identidad')
-        ->where('cedula_identidad', $request->input("cedula"))
-        ->where('complemento_cedula', $request->input("complemento"))
-        ->distinct()
-        ->get();
-
-        if ($request->paterno == "" && $request->materno == "") {
-            return "apellido";
-        }else{
-            if (count($cedulas) > 0) {
-                return "cedula_repetida";
             }else{
-                if($request->recinto != ""){
-                    $persona=new Persona;
-                        
-                    $persona->nombre=ucwords(strtolower($request->input("nombres")));
-                    $persona->paterno=ucwords(strtolower($request->input("paterno")));
-                    $persona->materno=ucwords(strtolower($request->input("materno")));
-                    $persona->cedula_identidad=$request->input("cedula");
-                    $persona->complemento_cedula=strtoupper($request->input("complemento"));
-                    $persona->expedido="LP";
-                    $persona->fecha_nacimiento=$request->input("nacimiento");
-                    $persona->telefono_celular=$request->input("telefono");
-                    // $persona->telefono_referencia=$request->input("telefono_ref");
-                    $persona->telefono_referencia="0";
-                    // $persona->direccion=ucwords(strtolower($request->input("direccion")));
-                    $persona->direccion="";
-                    $persona->email="";
-                    $persona->grado_compromiso=4;
-                    $persona->fecha_registro=date('Y-m-d');
-                    $persona->activo=1;
-                    $persona->asignado=1;
-                    $persona->id_recinto=$request->input("recinto");
-                    $persona->id_origen=$request->input("id_origen");
-                    $persona->id_sub_origen=$request->input("id_sub_origen");
-                    $persona->id_responsable_registro=Auth::user()->id;
-                    // $persona->titularidad=$request->input("titularidad");
-                    // $persona->informatico=$request->input("informatico");
-                    $persona->titularidad="TITULAR";
-                    $persona->informatico="SI";
-                    $persona->evidencia=$request->input("evidencia");
-                    
-                    $persona->id_rol=15;
-                    
-                    //Subimos el archivo
-                    if($request->file('archivo') != ""){
-                        $tiempo_actual = new DateTime(date('Y-m-d H:i:s'));
-                        $archivo = $request->file('archivo');
-                        $mime = $archivo->getMimeType();
-                        $extension=strtolower($archivo->getClientOriginalExtension());
-
-                        $nuevo_nombre="R-".$request->input("recinto")."-CI-".$request->input("cedula")."-".$tiempo_actual->getTimestamp();
-
-                        $file = $request->file('archivo');
-
-                        $image = Image::make($file->getRealPath());
-                        
-                        //reducimos la calidad y cambiamos la dimensiones de la nueva instancia.
-                        $image->resize(1280, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                        });
-                        $image->orientate();
-
-                        $rutadelaimagen="../storage/media/evidencias/".$nuevo_nombre;
-        
-                        if ($image->save($rutadelaimagen)){
-
-
-                        //Redirigimos a la vista form_votar_presidencial
-
-                        $persona->archivo_evidencia=$rutadelaimagen;
-
-                        }
-                        else{
-                            return view("mensajes.msj_error")->with("msj","Ocurrio un error al subir la imagen");
-                        }
-                    }
-    
-                    if($persona->save())
-                    {
-                        $persona = Persona::find($persona->id_persona);
-                        $recinto = Recinto::find($request->input("recinto"));
-
-                        $username = $this->ObtieneUsuario($persona->id_persona);
-                        // $persona->id_rol =$request->input("id_rol");
-                
-                        $usuario=new User;
-                        $usuario->name=$username;
-                        // $email=strtolower($persona->nombre.$persona->paterno.$persona->materno).'@'.$username;
-                        $usuario->email = $username;
-                        $usuario->password= bcrypt($username);
-                        $usuario->id_persona=$persona->id_persona;
-                        $usuario->activo=1;
-                
-                        if($request->input("rol_slug") == ''){
-                            //rol delegado del MAS
-                            return 'rol';
-                        }elseif($request->input("rol_slug") == 'militante'){
-                            //rol delegado del MAS
-                            if ($usuario->save()) {
-
-                                $rol = \DB::table('roles')
-                                ->where('roles.slug', $request->input("rol_slug"))
-                                ->first();
-
-                                // Cambiando el rol de persona
-                                $persona->id_rol = $rol->id;
-                                //Asignando rol
-                                $usuario->assignRole($rol->id);
-            
-                                if ($persona->save()) {
-                                    // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                    return view("formularios.form_agregar_persona")
-                                    ->with('circunscripciones', $circunscripciones_listado)
-                                    ->with('origenes', $origenes_listado)
-                                    ->with('roles', $roles_listado)
-                                    ->with('casas', $casas_listado)
-                                    ->with('vehiculos', $vehiculos_listado)
-                                    ->with('evidencias', $evidencias_listado);
-                                } else {
-                                    // si no se guarda el update
-                                }
-                                
-                            } else {
-                                //si el usuario no se guarda
-                                return "failed usuario;";
-                            }
-                        }elseif ($request->input("rol_slug") == 'conductor') {
-                            // rol Conductor
-                            if ($request->input("id_vehiculo") != "") {
-                                //Si el usuario es creado correctamente modificamos su rol
-
-                                if ($usuario->save()) {
-                    
-                                    $rol = \DB::table('roles')
-                                    ->where('roles.slug', $request->input("rol_slug"))
-                                    ->first();
-                                        // agregando el rol conductor a persona;
-                                    $persona->id_rol = $rol->id;
-                                    //Asignando rol el rol conductor al usuario
-                                    $usuario->assignRole($rol->id);
-                                    if ($persona->save()) {
-                                        // creamos las relaciones usuario - transporte
-                                        $usuario_transporte = new UsuarioTransporte();
-                                        $usuario_transporte->id_usuario = $usuario->id;
-                                        $usuario_transporte->id_transporte = $request->input("id_vehiculo");
-                                        $usuario_transporte->activo = 1;
-                                        if ($usuario_transporte->save()) {
-                                            // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                            return view("formularios.form_agregar_persona")
-                                            ->with('circunscripciones', $circunscripciones_listado)
-                                            ->with('origenes', $origenes_listado)
-                                            ->with('roles', $roles_listado)
-                                            ->with('casas', $casas_listado)
-                                            ->with('vehiculos', $vehiculos_listado)
-                                            ->with('evidencias', $evidencias_listado);
-                                        } else {
-                                            # code...
-                                        }
-                                    } else {
-                                        // si no se guarda el update
-                                    }
-                                    
-                                } else {
-                                    //si el usuario no se guarda
-                                    return "failed usuario;";
-                                }
-                                
-                            } else {
-                                return "id_vehiculo";
-                            }
-                            // fin Conductor
-                        }elseif ($request->input("rol_slug") == 'registrador') {
-                            // rol Registrador
-                            if ($request->input("id_casa_campana") != "") {
-                
-                                //Si el usuario es creado correctamente modificamos su rol
-                                if ($usuario->save()) {
-                    
-                                    $rol = \DB::table('roles')
-                                    ->where('roles.slug', $request->input("rol_slug"))
-                                    ->first();
-
-                                    // agregando el rol registrador en la tabla persona
-                                    $persona->id_rol = $rol->id;
-
-                                    //Asignando rol registrador en la tabla users
-                                    $usuario->assignRole($rol->id);
-                
-                                    if ($persona->save()) {
-                                        // creamos las relaciones usuario - recinto
-                                        $usuario_casa_campana = new UsuarioCasaCampana();
-                                        $usuario_casa_campana->id_usuario = $usuario->id;
-                                        $usuario_casa_campana->id_casa_campana = $request->input("id_casa_campana");
-                                        $usuario_casa_campana->activo = 1;
-                                        if ($usuario_casa_campana->save()) {
-                                            // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                            return view("formularios.form_agregar_persona")
-                                            ->with('circunscripciones', $circunscripciones_listado)
-                                            ->with('origenes', $origenes_listado)
-                                            ->with('roles', $roles_listado)
-                                            ->with('casas', $casas_listado)
-                                            ->with('vehiculos', $vehiculos_listado)
-                                            ->with('evidencias', $evidencias_listado);
-                                        } else {
-                                            return "failed usuario;";
-                                        }
-                                    } else {
-                                        // si no se guarda el update
-                                    }
-                                    
-                                } else {
-                                    //si el usuario no se guarda
-                                    return "failed usuario;";
-                                }
-                                
-                            } else {
-                                return "id_casa_campana";
-                            }
-                            // fin Registrador
-                        }elseif ($request->input("rol_slug") == 'call_center') {
-                            //rol Call Center
-                            //Si el usuario es creado correctamente modificamos su rol
-                            if ($usuario->save()) {
-
-                                $rol = \DB::table('roles')
-                                ->where('roles.slug', $request->input("rol_slug"))
-                                ->first();
-
-                                // Cambiando el rol de persona
-                                $persona->id_rol = $rol->id;
-                                //Asignando rol
-                                $usuario->assignRole($rol->id);
-            
-                                if ($persona->save()) {
-                                    // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                    return view("formularios.form_agregar_persona")
-                                    ->with('circunscripciones', $circunscripciones_listado)
-                                    ->with('origenes', $origenes_listado)
-                                    ->with('roles', $roles_listado)
-                                    ->with('casas', $casas_listado)
-                                    ->with('vehiculos', $vehiculos_listado)
-                                    ->with('evidencias', $evidencias_listado);
-                                } else {
-                                    // si no se guarda el update
-                                }
-                                
-                            } else {
-                                //si el usuario no se guarda
-                                return "failed usuario;";
-                            }
-                        }elseif ($request->input("rol_slug") == 'responsable_mesa'){
-                            //rol responsable_mesa
-                            if ($request->has("mesas")) {
-                
-                                //Si el usuario es creado correctamente modificamos su rol
-                                if ($usuario->save()) {
-                    
-                                    $rol = \DB::table('roles')
-                                    ->where('roles.slug', $request->input("rol_slug"))
-                                    ->first();
-                    
-                                    $persona->id_rol =$rol->id;
-                                    //Asignando rol
-                                    $usuario->assignRole($rol->id);
-                    
-                                    if ($persona->save()) {
-                                        // creamos las relaciones usuario - mesas
-                                        foreach ($request->mesas as $value) {
-                                            $usuario_mesa = new UsuarioMesa;
-                                            $usuario_mesa->id_usuario = $usuario->id;
-                                            $usuario_mesa->id_mesa = $value;
-                                            $usuario_mesa->activo = 1;
-                                            $usuario_mesa->save();
-                                        }
-                                        // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                        return view("formularios.form_agregar_persona")
-                                        ->with('circunscripciones', $circunscripciones_listado)
-                                        ->with('origenes', $origenes_listado)
-                                        ->with('roles', $roles_listado)
-                                        ->with('casas', $casas_listado)
-                                        ->with('vehiculos', $vehiculos_listado)
-                                        ->with('evidencias', $evidencias_listado);
-                                    } else {
-                                        // si no se guarda el update
-                                    }
-                                    
-                                } else {
-                                    //si el usuario no se guarda
-                                    return "failed usuario;";
-                                }
-                                
-                            } else {
-                                return "mesas";
-                            }
-                        //fin rol informarico
-                        }elseif ($request->input("rol_slug") == 'responsable_recinto') {
-
-                            // rol responsable recinto
-                            if ($request->input("recinto") != "") {
-                                    
-                                //Si el usuario es creado correctamente modificamos su rol
-                                if ($usuario->save()) {
-                    
-                                    $rol = \DB::table('roles')
-                                    ->where('roles.slug', $request->input("rol_slug"))
-                                    ->first();
-
-                                    // $persona->id_rol =$request->input("id_rol");
-                                    $persona->id_rol =$rol->id;
-                                    //Asignando rol
-                                    $usuario->assignRole($rol->id);
-                                    if ($persona->save()) {
-                                        // creamos las relaciones usuario - recinto
-                                        $usuario_recinto = new UsuarioRecinto;
-                                        $usuario_recinto->id_usuario = $usuario->id;
-                                        $usuario_recinto->id_recinto = $request->input("recinto");
-                                        $usuario_recinto->activo = 1;
-                                        if ($usuario_recinto->save()) {
-                                            // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                            return view("formularios.form_agregar_persona")
-                                            ->with('circunscripciones', $circunscripciones_listado)
-                                            ->with('origenes', $origenes_listado)
-                                            ->with('roles', $roles_listado)
-                                            ->with('casas', $casas_listado)
-                                            ->with('vehiculos', $vehiculos_listado)
-                                            ->with('evidencias', $evidencias_listado);
-                                        } else {
-                                            # code...
-                                        }
-                                    } else {
-                                        // si no se guarda el update
-                                    }
-                                    
-                                } else {
-                                    //si el usuario no se guarda
-                                    return "failed usuario;";
-                                }
-                                
-                            } else {
-                                return "recinto";
-                            }
-                            // finresponsable recinto
-                        }elseif ($request->input("rol_slug") == 'responsable_distrito') {
-                            //rol Responsable de Distrito
-                            
-                            if ($request->input("recinto") != "") {
-                
-                                //Si el usuario es creado correctamente modificamos su rol
-                                if ($usuario->save()) {
-                    
-                                    $rol = \DB::table('roles')
-                                    ->where('roles.slug', $request->input("rol_slug"))
-                                    ->first();
-                                        // $persona->id_rol =$request->input("id_rol");
-                                    $persona->id_rol =$rol->id;
-                                    //Asignando rol
-                                    $usuario->assignRole($rol->id);
-                    
-                                    if ($persona->save()) {
-                                        // creamos las relaciones usuario - recinto
-                                        $usuario_distrito = new UsuarioDistrito;
-                                        $usuario_distrito->id_usuario = $usuario->id;
-                                        $usuario_distrito->id_distrito = $recinto->distrito;
-                                        $usuario_distrito->activo = 1;
-                                        if ($usuario_distrito->save()) {
-                                            // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                            return view("formularios.form_agregar_persona")
-                                            ->with('circunscripciones', $circunscripciones_listado)
-                                            ->with('origenes', $origenes_listado)
-                                            ->with('roles', $roles_listado)
-                                            ->with('casas', $casas_listado)
-                                            ->with('vehiculos', $vehiculos_listado)
-                                            ->with('evidencias', $evidencias_listado);
-                                        } else {
-                                            # code...
-                                        }
-                                    } else {
-                                        // si no se guarda el update
-                                    }
-                                    
-                                } else {
-                                    //si el usuario no se guarda
-                                    return "failed usuario;";
-                                }
-                                
-                            } else {
-                                return "distrito";
-                            }
-                            //fin Responsable de Distrito
-                        }elseif ($request->input("rol_slug") == 'responsable_circunscripcion') {
-                            //rol Responsable Circunscripcion
-                            if ($request->input("recinto") != "") {
-                    
-                                //Si el usuario es creado correctamente modificamos su rol
-                                if ($usuario->save()) {
-
-                                    $rol = \DB::table('roles')
-                                    ->where('roles.slug', $request->input("rol_slug"))
-                                    ->first();
-                                        // $persona->id_rol =$request->input("id_rol");
-                                    $persona->id_rol =$rol->id;
-                                    //Asignando rol
-                                    $usuario->assignRole($rol->id);
-                
-                                    if ($persona->save()) {
-                                        // creamos las relaciones usuario - recinto
-                                        $usuario_circunscripcion = new UsuarioCircunscripcion;
-                                        $usuario_circunscripcion->id_usuario = $usuario->id;
-                                        $usuario_circunscripcion->id_circunscripcion = $recinto->circunscripcion;
-                                        $usuario_circunscripcion->activo = 1;
-                                        if ($usuario_circunscripcion->save()) {
-                                            // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                                            return view("formularios.form_agregar_persona")
-                                            ->with('circunscripciones', $circunscripciones_listado)
-                                            ->with('origenes', $origenes_listado)
-                                            ->with('roles', $roles_listado)
-                                            ->with('casas', $casas_listado)
-                                            ->with('vehiculos', $vehiculos_listado)
-                                            ->with('evidencias', $evidencias_listado);
-                                        } else {
-                                            # code...
-                                        }
-                                    } else {
-                                        // si no se guarda el update
-                                    }
-                                    
-                                } else {
-                                    //si el usuario no se guarda
-                                    return "failed usuario;";
-                                }
-                                
-                            } else {
-                                return "circunscripcion";
-                            }
-                            // fin Responsable Circunscripcion
-                        }else{
-                
-                        }
-
-                        // return view("mensajes.msj_enviado")->with("msj","enviado_crear_persona");
-                        return view("formularios.form_agregar_persona")
-                        ->with('circunscripciones', $circunscripciones_listado)
-                        ->with('origenes', $origenes_listado)
-                        ->with('roles', $roles_listado)
-                        ->with('casas', $casas_listado)
-                        ->with('vehiculos', $vehiculos_listado)
-                        ->with('evidencias', $evidencias_listado);
-                    }else{
-                        return "failed";
-                    }
-                }
-                else{
-                    return "recinto";
-                }
+                $foto = "";
             }
         }
+
+        $persona=new Persona;
+                                
+        $persona->nombre=ucwords(strtolower($request->input("nombre")));
+        $persona->paterno=ucwords(strtolower($request->input("paterno")));
+        $persona->materno=ucwords(strtolower($request->input("materno")));
+        $persona->cedula_identidad=$request->input("cedula_identidad");
+        $persona->edad=$request->input("edad");
+        $persona->sexo=$request->input("sexo");
+        $persona->foto=$foto;
+        $persona->activo=1;
+
+        if($persona->save()){
+            $username = $this->ObtieneUsuario($persona->id_persona);
+            $usuario=new User;
+            $usuario->name=$username;
+        
+            $usuario->email = $username;
+            $usuario->password= bcrypt($username);
+            $usuario->id_persona=$persona->id_persona;
+            $usuario->activo=1;
+
+            if($usuario->save()){
+                $usuario->assignRole($request->input("rol"));
+                return redirect('/listado_personas')->with('mensaje_exito', 'Agregado exitosamente');
+            }else{
+                return view("mensajes.mensaje_error")->with("msj","...Hubo un error al agregar ;...") ;
+            }
+
+        }else{
+            return view("mensajes.mensaje_error")->with("msj","...Hubo un error al agregar ;...") ;
+        }
+
     }
 
 
@@ -1556,17 +1004,18 @@ class PersonasController extends Controller
     }
 
     public function listado_personas(){
-        if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-            return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        }
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
+
+        $personas = Persona::with('usuario')
+            ->with('usuario.roles')->get();
+        dd($personas);
+        return "Hello";
         $personas = \DB::table('personas')
-        ->join('recintos', 'personas.id_recinto', 'recintos.id_recinto')
-        ->join('origen', 'personas.id_origen', 'origen.id_origen')
-        ->leftjoin('sub_origen', 'personas.id_sub_origen', 'sub_origen.id_sub_origen')
+        ->join('users', 'personas.id_persona', 'users.id_persona')
         ->leftjoin('roles', 'personas.id_rol', 'roles.id')
-        ->select('personas.*', 'recintos.id_recinto', 'recintos.nombre as nombre_recinto', 'recintos.circunscripcion', 'recintos.distrito',
-                 'recintos.zona', 'recintos.direccion as direccion_recinto',
-                 'origen.origen', 'sub_origen.nombre as sub_origen',
+        ->select('personas.*',
                  'roles.name as nombre_rol', 'roles.description'
         )
         ->orderBy('fecha_registro', 'desc')
