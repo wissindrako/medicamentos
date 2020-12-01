@@ -29,9 +29,7 @@ class ValidacionPersona extends FormRequest
                 'paterno' => 'required_without:materno',
                 'materno' => 'required_without:paterno',
                 'cedula_identidad' => 'required|unique:personas' . $this->route('id'),
-                'edad' => 'required',
-                'sexo' => 'required',
-                'rol_id' => 'required'
+                'rol' => 'required'
             ];
         } else {
             return [
@@ -39,8 +37,6 @@ class ValidacionPersona extends FormRequest
                 'paterno' => 'required_without:materno',
                 'materno' => 'required_without:paterno',
                 'cedula_identidad' => 'required|unique:personas' . $this->route('id'),
-                'edad' => 'required',
-                'sexo' => 'required',
                 'rol' => 'required'
             ];
         }

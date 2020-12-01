@@ -27,7 +27,7 @@
 
                   <div class="col-md-12" >
                     @if (count($errors) > 0)
-                     
+                        <br>
                         <div class="alert alert-danger">
                             <strong>UPPS!</strong> Error al Registrar<br>
                             <ul>
@@ -74,24 +74,6 @@
                                 <input type="input" name="complemento" placeholder="" class="form-control" value="{{ old('complemento') }}" />
                             </div>
                         </div> --}}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class=" ">Edad</label>
-                                <input style='line-height: initial;' type="number" name="edad" placeholder="" min="1" max="110" class="form-control" value="{{ old('edad') }}" />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="text-black">Sexo</label>
-                                <div class="form-group bg-gray">
-                                    <select class="form-control" name="sexo">
-                                        <option value="" selected> --- SELECCIONE SU GENERO --- </option>
-                                        <option value="MASCULINO">MASCULINO</option>
-                                        <option value="FEMENINO">FEMENINO</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="text-black">Rol</label>
@@ -105,15 +87,63 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6" id="div_edad">
+                            <div class="form-group">
+                                <label class=" ">Edad</label>
+                                <input style='line-height: initial;' type="number" name="edad" id="edad" placeholder="" min="1" max="110" class="form-control" value="{{ old('edad') }}" />
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="div_sexo">
+                            <div class="form-group">
+                                <label class="text-black">Sexo</label>
+                                <div class="form-group bg-gray">
+                                    <select class="form-control" name="sexo" id="sexo">
+                                        <option value="" selected> --- SELECCIONE SU GENERO --- </option>
+                                        <option value="MASCULINO">MASCULINO</option>
+                                        <option value="FEMENINO">FEMENINO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-12" id="div_institucion">
+                            <div class="form-group">
+                                <label >Institucion</label>
+                                <input type="input" name="institucion" id="institucion" placeholder="" class="form-control" value="{{ old('institucion') }}"/>
+                            </div>
+                        </div>
+                        <div class="col-md-12" id="div_especialidad">
+                            <div class="form-group">
+                                <label >Especialidad</label>
+                                <input type="input" name="especialidad" id="especialidad" placeholder="" class="form-control" value="{{ old('especialidad') }}"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" id="div_medico">
+                            <div class="form-group">
+                                <label class="text-black">Médico de Cabecera</label>
+                                <div class="form-group bg-gray">
+                                    <select  class="form-control" name="medico" id="medico">
+                                        <option value="" selected> --- SELECCIONE UN MEDICO --- </option>
+                                        @foreach ($personas as $item)
+                                            @if ($item->usuario->roles[0]->slug == 'medico')
+                                                <option value={{$item->id_persona}}>{{ $item->nombre}} {{$item->paterno}} {{$item->materno}}</option>                                                
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
 
 
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label class="text-black ">Subir </label>
                                 <input name="archivo" id="archivo" type="file" class="text-white" accept="image/*"/>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="col-md-12">
                             <br>
                         </div>
@@ -130,4 +160,77 @@
 </section>
 
 </section>
+@endsection
+
+@section('scripts')
+	
+@parent
+<script>
+	function activar_mesas() {
+
+
+    // Ocultando Divs al iniciar
+
+    $("#div_institucion").hide();
+    $("#div_especialidad").hide();
+    $("#div_medico").hide();
+    $("#div_edad").hide();
+    $("#div_sexo").hide();
+    document.getElementById("institucion").required = false;
+    document.getElementById("especialidad").required = false;
+    document.getElementById("medico").required = false;
+
+
+    $("#rol_slug").change(function(){
+        
+        
+        //id obtenido de la base de datos "campo : slug"
+        var rol_slug = $("#rol_slug").val();
+        // alertify.success(rol_slug);
+        if (rol_slug == '3') { //medico
+            $("#div_institucion").show();
+            $("#div_especialidad").show();
+            $("#div_medico").hide();
+            $("#div_edad").hide();
+            $("#div_sexo").hide();
+            document.getElementById("institucion").required = true;
+            document.getElementById("especialidad").required = true;
+            document.getElementById("medico").required = false;
+            document.getElementById("edad").required = false;
+            document.getElementById("sexo").required = false;
+        }else if(rol_slug == '1'){ //Administrador
+            $("#div_institucion").hide();
+            $("#div_especialidad").hide();
+            $("#div_medico").hide();
+            $("#div_edad").hide();
+            $("#div_sexo").hide();
+            document.getElementById("institucion").required = false;
+            document.getElementById("especialidad").required = false;
+            document.getElementById("medico").required = false;
+            document.getElementById("edad").required = false;
+            document.getElementById("sexo").required = false;
+
+        }else{
+            $("#div_institucion").hide();
+            $("#div_especialidad").hide();
+            $("#div_medico").show();
+            $("#div_edad").show();
+            $("#div_sexo").show();
+            document.getElementById("institucion").required = false;
+            document.getElementById("especialidad").required = false;
+            document.getElementById("medico").required = true;
+            document.getElementById("edad").required = true;
+            document.getElementById("sexo").required = true;
+        }
+    });
+  
+
+
+    
+	
+	}	
+	activar_mesas();
+	
+	
+	</script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidacionPersona;
+use App\Models\Historial;
 use Illuminate\Support\Facades\Validator;
 use Datatables;
 use DateTime;
@@ -24,6 +25,9 @@ class PersonasController extends Controller
         //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
         // }
 
+        $personas = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->get();
 
         if (Auth::guest()) {
             $roles = \DB::table('roles')
@@ -33,9 +37,9 @@ class PersonasController extends Controller
             $roles = \DB::table('roles')->get();
         }
 
-
         return view("formularios.form_agregar_persona")
-        ->with('roles', $roles);
+        ->with('roles', $roles)
+        ->with('personas', $personas);
     }
 
     public function agregar_persona(ValidacionPersona $request){
@@ -82,6 +86,9 @@ class PersonasController extends Controller
         $persona->cedula_identidad=$request->input("cedula_identidad");
         $persona->edad=$request->input("edad");
         $persona->sexo=$request->input("sexo");
+        $persona->especialidad=$request->input("especialidad");
+        $persona->institucion=$request->input("institucion");
+        $persona->id_medico=$request->input("medico");
         $persona->foto=$foto;
         $persona->activo=1;
 
@@ -97,6 +104,13 @@ class PersonasController extends Controller
 
             if($usuario->save()){
                 $usuario->assignRole($request->input("rol"));
+
+                if ($request->input("rol") == 4) {
+                    $historial = new Historial;
+                    $historial->id_persona = $persona->id_persona;
+                    $historial->save();
+                } 
+                
                 return redirect('/listado_personas')->with('mensaje_exito', 'Agregado exitosamente');
             }else{
                 return view("mensajes.mensaje_error")->with("msj","...Hubo un error al agregar ;...") ;
@@ -1009,28 +1023,11 @@ class PersonasController extends Controller
         // }
 
         $personas = Persona::with('usuario')
-            ->with('usuario.roles')->get();
-        dd($personas);
-        return "Hello";
-        $personas = \DB::table('personas')
-        ->join('users', 'personas.id_persona', 'users.id_persona')
-        ->leftjoin('roles', 'personas.id_rol', 'roles.id')
-        ->select('personas.*',
-                 'roles.name as nombre_rol', 'roles.description'
-        )
-        ->orderBy('fecha_registro', 'desc')
-        ->orderBy('id_persona', 'desc')
-        ->get();
-
-        $id_usuario = Auth::user()->id;
-        $rol = \DB::table('role_user')
-        ->join('roles', 'role_user.role_id', 'roles.id')
-        ->where('user_id', $id_usuario)
-        ->first();
-
+            ->with('usuario.roles')
+            ->get();
+        // dd($personas);
         return view("listados.listado_personas")
-        ->with('personas', $personas)
-        ->with('rol', $rol);
+        ->with('personas', $personas);
     }
     
     // public function buscar_persona(Request $request){
@@ -1055,22 +1052,26 @@ class PersonasController extends Controller
     // }
 
     public function buscar_persona(){
-        return Datatables::of(Persona::join('recintos', 'personas.id_recinto', 'recintos.id_recinto')
-        ->join('origen', 'personas.id_origen', 'origen.id_origen')
-        ->leftjoin('sub_origen', 'personas.id_sub_origen', 'sub_origen.id_sub_origen')
-        ->leftjoin('roles', 'personas.id_rol', 'roles.id')
-        ->leftjoin('tipo_evidencias', 'personas.evidencia', 'tipo_evidencias.id')
-        ->select('personas.*', 'recintos.id_recinto', 'recintos.nombre as nombre_recinto', 'recintos.circunscripcion', 'recintos.distrito', 'recintos.distrito_referencial',
-        'recintos.zona', 'recintos.direccion as direccion_recinto',
-        'origen.origen', 'sub_origen.nombre as sub_origen',
-        'roles.name as nombre_rol', 'roles.description',
-        'tipo_evidencias.nombre as nombre_evidencia',
-        \DB::raw('CONCAT(personas.telefono_celular," - ", personas.telefono_referencia) as contacto'),
-        \DB::raw('CONCAT(personas.paterno," ",personas.materno," ",personas.nombre) as nombre_completo'),
-        \DB::raw('CONCAT(personas.telefono_celular," - ", personas.telefono_referencia) as contacto'),
-        \DB::raw('CONCAT(personas.cedula_identidad," - ", personas.complemento_cedula) as ci')
-        )
-        ->get())->make(true);
+        // return Datatables::of(Persona::join('recintos', 'personas.id_recinto', 'recintos.id_recinto')
+        // ->join('origen', 'personas.id_origen', 'origen.id_origen')
+        // ->leftjoin('sub_origen', 'personas.id_sub_origen', 'sub_origen.id_sub_origen')
+        // ->leftjoin('roles', 'personas.id_rol', 'roles.id')
+        // ->leftjoin('tipo_evidencias', 'personas.evidencia', 'tipo_evidencias.id')
+        // ->select('personas.*', 'recintos.id_recinto', 'recintos.nombre as nombre_recinto', 'recintos.circunscripcion', 'recintos.distrito', 'recintos.distrito_referencial',
+        // 'recintos.zona', 'recintos.direccion as direccion_recinto',
+        // 'origen.origen', 'sub_origen.nombre as sub_origen',
+        // 'roles.name as nombre_rol', 'roles.description',
+        // 'tipo_evidencias.nombre as nombre_evidencia',
+        // \DB::raw('CONCAT(personas.telefono_celular," - ", personas.telefono_referencia) as contacto'),
+        // \DB::raw('CONCAT(personas.paterno," ",personas.materno," ",personas.nombre) as nombre_completo'),
+        // \DB::raw('CONCAT(personas.telefono_celular," - ", personas.telefono_referencia) as contacto'),
+        // \DB::raw('CONCAT(personas.cedula_identidad," - ", personas.complemento_cedula) as ci')
+        // )
+        // ->get())->make(true);
+
+        return Datatables::of(Persona::with('usuario')
+        ->with('usuario.roles')->get())->make(true);
+
     }
 
     public function ConsultaSubOrigen($id_origen){

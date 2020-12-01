@@ -1,6 +1,6 @@
 <head>
     <meta charset="UTF-8">
-    <title> Encuestas - @yield('htmlheader_title', 'Encuestas') </title>
+    <title> Sistema Experto - @yield('htmlheader_title', 'Sistema Experto') </title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     {{-- <meta name="description" content="@yield('description')"> --}}
     <meta name="description" content="Realiza encuestas de producción de Cafe y Cacao">

@@ -10,6 +10,8 @@ class User extends Authenticatable
     use Notifiable;
     use ShinobiTrait;
 
+    const ROL_MEDICO = 'medico';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -37,7 +39,6 @@ class User extends Authenticatable
         //return $this->belongsTo('App\Persona', 'foreign_key', 'local_key');
         return $this->belongsTo('App\Persona', 'id_persona', 'id_persona');
     }
-
 
     public function mesas()
     {

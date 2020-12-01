@@ -36,6 +36,15 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('home_encuestas', 'FormEncuestasController@home_encuestas');
 
 
+    Route::get('persona/{id}/opciones', 'ExpertoController@form_opciones')->name('opciones_persona');
+    Route::get('persona/{id}/antecedentes', 'HistorialController@form_antecedentes')->name('antecedentes_persona');
+    Route::post('guardar_antecedentes', 'HistorialController@guardar_antecedentes');
+    Route::get('persona/{id}/enfermedades', 'HistorialController@form_enfermedades')->name('enfermedades_persona');
+    Route::post('guardar_enfermedades', 'HistorialController@guardar_enfermedades');
+    Route::get('persona/{id}/alergias', 'HistorialController@form_alergias')->name('alergias_persona');
+    Route::post('guardar_alergias', 'HistorialController@guardar_alergias');
+
+
     Route::get('/listado_personas', function (){
         return view('listado.listado_personas');
     })->name('admin.listado_personas');
@@ -43,7 +52,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/home', 'HomeController@index');
 
 
-    Route::get('form_agregar_persona', 'PersonasController@form_agregar_persona');
+    Route::get('form_agregar_persona', 'PersonasController@form_agregar_persona')->name('form_agregar_persona');
     Route::post('agregar_persona', 'PersonasController@agregar_persona');
 
     Route::get('form_editar_persona/{id_persona}', 'PersonasController@form_editar_persona');
