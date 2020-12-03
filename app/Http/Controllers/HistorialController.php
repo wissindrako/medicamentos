@@ -122,8 +122,10 @@ class HistorialController extends Controller
         ->where('id_persona', $historia->id_persona)
         ->get();
 
-        $historia->alergias = json_encode($request->alergias);
-        $historia->save();
+        if($request->alergias){
+            $historia->alergias = json_encode($request->alergias);
+            $historia->save();
+        }
 
         return view("formularios.opciones.index")
         ->with('persona', $persona);
@@ -203,8 +205,10 @@ class HistorialController extends Controller
         ->where('id_persona', $historia->id_persona)
         ->get();
 
-        $historia->recetas = json_encode($request->recetas);
-        $historia->save();
+        if($request->recetas){
+            $historia->recetas = json_encode($request->recetas);
+            $historia->save();
+        }
 
         return view("formularios.opciones.index")
         ->with('persona', $persona);

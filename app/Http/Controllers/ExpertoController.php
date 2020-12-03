@@ -93,13 +93,14 @@ class ExpertoController extends Controller
                 array_push($resultados, $e);
             }
             if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+            else{$recetas = [];}
 
         }
 
         $arr_antecedentes = array_keys($antecedentes);
         $arr_enfermedades = $enfermedades;
-        $arr_alergias = array_keys($alergias);
-        $arr_recetas = array_keys($recetas);
+        $arr_alergias = $alergias;
+        $arr_recetas = $recetas;
 
         // dd($arr_antecedentes);
 
@@ -126,8 +127,8 @@ class ExpertoController extends Controller
                 // dd($data);
                 if($data){
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
-                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus antecedentes';
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus antecedentes registrados en su Historia Clínica.';
                     array_push($resultados, $e);
                 }
             }
@@ -141,8 +142,8 @@ class ExpertoController extends Controller
                 // dd($data);
                 if($data){
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
-                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus falencias registradas';
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus falencias registradas en su Historia Clínica.';
                     array_push($resultados, $e);
                 }
                 
@@ -153,16 +154,51 @@ class ExpertoController extends Controller
             foreach ($arr_alergias as $value) {
                 $medicamentos = Medicamento::where('nombre', $datos);
                 // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
-                $data = $medicamentos->where('meta', 'like', '%'.$value.'%')->first();
+                $data = $medicamentos->where('nombre', 'like', '%'.$value.'%')->first();
                 // dd($data);
                 if($data){
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
-                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus falencias registradas';
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "Interacciones"';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus alergias registradas en su Historia Clínica.';
                     array_push($resultados, $e);
                 }
                 
             }
+
+            //RECETAS
+
+            foreach ($arr_recetas as $value) {
+                $medicamentos = Medicamento::where('nombre', $datos);
+                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
+                $data = $medicamentos->where('nombre', 'like', '%'.$value.'%')->first();
+                // dd($data);
+                if($data){
+                    $e = array();
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' se encuentra en los medicamentos que consume';
+                    $e['conclusion'] = 'Su administración podría causar "Sobredosis" si aumenta el tiempo y cantidad recomendada por su Médico.';
+                    array_push($resultados, $e);
+                }
+                
+            }
+            // dd($arr_recetas);
+
+            foreach ($arr_recetas as $value) {
+                // $medicamentos = Medicamento::all();
+                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
+                $meta = Medicamento::where('meta', 'like', '%'.$value.'%')->get();
+
+                foreach ($meta as $key => $data) {
+                    if($data){
+                        $e = array();
+                        $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
+                        $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en los medicamentos que consume según su Historia Clínica.';
+                        array_push($resultados, $e);
+                    }
+                }
+                
+            }
+            
+
         }
 
         // $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
