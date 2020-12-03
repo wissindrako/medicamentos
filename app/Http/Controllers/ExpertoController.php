@@ -4,17 +4,47 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Historial;
+use App\Models\Medicamento;
 use App\Persona;
 
 class ExpertoController extends Controller
 {
-    public function form_opciones($id){
+    public function index($id){
         //carga el formulario para agregar un nueva persona
 
         // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
         //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
         // }
         
+        
+        $paciente = Persona::findOrFail($id);
+        $historia = Historial::where('id_persona', $paciente->id_persona)->first();
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $id)
+        ->get();
+
+        if($historia){
+            if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+            if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+            if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+            if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+        }
+        // return view('admin.user.editar', compact('data', 'roles'));
+        return view('formularios.sistema_experto.index', compact('paciente', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares'));
+    }
+    
+    public function form_opciones($id){
+        //carga el formulario para agregar un nueva persona
+
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
         
         $persona = Persona::with('usuario')
         ->with('usuario.roles')
@@ -23,6 +53,75 @@ class ExpertoController extends Controller
 
         return view("formularios.opciones.index")
         ->with('persona', $persona);
+    }
+
+    public function motorInferencia($id, $datos){
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
+        $paciente = Persona::findOrFail($id);
+        $historia = Historial::where('id_persona', $paciente->id_persona)->first();
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+
+        $resultados = array();
+
+        if($historia){
+            if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes, true);}
+            else{
+                $e = array();
+                $e['premisa'] = 'Si: los antecedentes del paciente no están registrados';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica';
+                array_push($resultados, $e);
+            }
+            if ($historia->enfermedades) {$enfermedades = array_keys(json_decode($historia->enfermedades, true));}
+            else{
+                $e = array();
+                $e['premisa'] = 'Si: las enfermedades del paciente no están registradas';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica';
+                array_push($resultados, $e);
+            }
+            if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+            else{
+                $e = array();
+                $e['premisa'] = 'Si: las alergias del paciente no están registradas';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica';
+                array_push($resultados, $e);
+            }
+        }
+        
+
+        // $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
+        $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
+
+        $book = array('book2','book3','book5');  
+
+        $arr_antecedentes = array_keys($antecedentes);
+        // dd($arr_antecedentes);
+        $antecedentes_medicamentos = \DB::Table('medicamentos')
+                ->select('nombre', 'efectos', 'conclusion', 'meta')                
+                ->Where(function ($query) use($arr_antecedentes) {
+                    for ($i = 0; $i < count($arr_antecedentes); $i++){
+                        $query->orwhere('meta', 'like',  '%' . $arr_antecedentes[$i] .'%');
+                    }      
+                })->get();
+        // dd($antecedentes_medicamentos);
+        $pacientes = array();
+
+        // foreach ($paciente as $key => $value) {
+            $e = array();
+
+            $e['id'] = $paciente->id_persona;
+            $e['nombre'] = $paciente->nombre;
+            $e['materno'] = $paciente->paterno;
+            $e['paterno'] = $paciente->materno;
+            array_push($pacientes, $e);
+        // }
+
+        // dd($paciente);
+
+        return json_encode($resultados);
     }
 
 }

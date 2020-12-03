@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Persona;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ValidacionPersona extends FormRequest
+class ValidacionFamiliar extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,23 +23,21 @@ class ValidacionPersona extends FormRequest
      */
     public function rules()
     {
-        
         if ($this->route('id')) {
-            $persona = Persona::findOrFail($this->route('id'));
             return [
                 'nombre' => 'required',
                 'paterno' => 'required_without:materno',
                 'materno' => 'required_without:paterno',
-                'cedula_identidad' => 'required|unique:users,email,' . $persona->usuario->id,
-                'rol' => 'required'
+                'telefono_celular' => 'required',
+                'parentesco' => 'required'
             ];
         } else {
             return [
                 'nombre' => 'required',
                 'paterno' => 'required_without:materno',
                 'materno' => 'required_without:paterno',
-                'cedula_identidad' => 'required|unique:personas,cedula_identidad',
-                'rol' => 'required'
+                'telefono_celular' => 'required',
+                'parentesco' => 'required'
             ];
         }
     }

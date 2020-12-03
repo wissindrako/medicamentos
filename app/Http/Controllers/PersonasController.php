@@ -24,9 +24,11 @@ class PersonasController extends Controller
         // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
         //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
         // }
+        $roles = [];
 
         $personas = Persona::with('usuario')
         ->with('usuario.roles')
+        ->where('activo', 1)
         ->get();
 
         if (Auth::guest()) {
@@ -123,205 +125,127 @@ class PersonasController extends Controller
     }
 
 
-    public function form_editar_persona($id_persona){
+    public function form_editar_persona($id){
         //carga el formulario para agregar un nueva persona
-        if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-            return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
+
+        $roles = [];
+
+        $data = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_persona', $id)
+        ->first();
+
+        $personas = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('activo', 1)
+        ->where('id_persona', '!=', $id)
+        ->get();
+
+        if (Auth::guest()) {
+            $roles = \DB::table('roles')
+            ->where('id', '>', 1)
+            ->get();
+        } else {
+            $roles = \DB::table('roles')->get();
         }
-
-        // $persona = Persona::find($id_persona);
-        $persona = \DB::table('personas')
-        ->join('recintos', 'personas.id_recinto', 'recintos.id_recinto')
-        ->join('origen', 'personas.id_origen', 'origen.id_origen')
-        ->leftjoin('sub_origen', 'personas.id_sub_origen', 'sub_origen.id_sub_origen')
-        ->leftjoin('roles', 'personas.id_rol', 'roles.id')
-        ->where('personas.id_persona', $id_persona)
-        ->select('personas.*', 'recintos.id_recinto', 'recintos.nombre as nombre_recinto', 'recintos.circunscripcion', 'recintos.distrito',
-                 'recintos.zona', 'recintos.direccion as direccion_recinto',
-                 'origen.origen', 'sub_origen.nombre as sub_origen',
-                 'roles.name as nombre_rol'
-        )
-        ->orderBy('fecha_registro', 'desc')
-        ->orderBy('id_persona', 'desc')
-        ->first();
-
-        $usuario = \DB::table('users')
-        ->where('id_persona', $id_persona)
-        ->select('id')
-        ->first();
-
-        $circunscripcion = \DB::table('recintos')
-        ->where('id_recinto', $persona->id_recinto)
-        ->select('circunscripcion')
-        ->distinct()
-        ->first();
-
-        $distrito = \DB::table('recintos')
-        ->where('id_recinto', $persona->id_recinto)
-        ->select('distrito')
-        ->distinct()
-        ->first();
-
-        $circunscripciones = \DB::table('recintos')
-        ->select('circunscripcion')
-        ->distinct()
-        ->orderBy('circunscripcion', 'asc')
-        ->get();
-        
-        $distritos = \DB::table('recintos')
-        ->where('circunscripcion', $circunscripcion->circunscripcion)
-        ->select('distrito')
-        ->distinct()
-        ->orderBy('distrito', 'asc')
-        ->get();
-
-        $recintos = \DB::table('recintos')
-        ->where('circunscripcion', $circunscripcion->circunscripcion)
-        ->where('distrito', $distrito->distrito)
-        ->select('id_recinto', 'nombre as nombre_recinto')
-        // ->distinct()
-        ->orderBy('id_recinto', 'asc')
-        ->get();
-
-        $origenes = \DB::table('origen')
-        ->where('activo', 1)
-        ->get();
-
-        $sub_origenes = \DB::table('sub_origen')
-        ->where('id_origen', $persona->id_origen)
-        ->where('activo', 1)
-        ->get();
-
-        $roles = \DB::table('roles')
-        ->where('id', '>=', 3)
-        ->get();
-
-        $casas =  \DB::table('casas_campana')
-        ->where('casas_campana.activo', 1)
-        ->orderBy('circunscripcion', 'asc')
-        ->orderBy('distrito', 'asc')
-        ->orderBy('id_casa_campana', 'asc')
-        ->get();
-
-        $casa_campana =  \DB::table('rel_usuario_campana')
-        ->where('activo', 1)
-        ->where('id_usuario', $usuario->id)
-        ->select('id_casa_campana')
-        ->first();
-
-        $vehiculos = \DB::table('transportes')
-        ->where('transportes.activo', 1)
-        ->orderBy('id_transporte', 'asc')
-        ->get();
-
-        $usuario_vehiculo = \DB::table('rel_usuario_transporte')
-        ->where('activo', 1)
-        ->where('id_usuario', $usuario->id)
-        ->select('id_transporte')
-        ->first();
-
-        $mesas_usuario =\DB::table('mesas')
-        ->leftjoin('rel_usuario_mesa', 'mesas.id_mesa', 'rel_usuario_mesa.id_mesa')
-        ->leftjoin('recintos', 'mesas.id_recinto', 'recintos.id_recinto')
-        ->leftjoin('users', 'rel_usuario_mesa.id_usuario', 'users.id')
-        ->leftjoin('personas', 'users.id_persona', 'personas.id_persona')
-        // ->where(function($query){
-        //     $query
-        //     ->where('rel_usuario_mesa.activo', null)
-        //     ->orwhere('rel_usuario_mesa.activo', 1);
-        // })
-        ->where('id_usuario', $usuario->id)
-        ->where('rel_usuario_mesa.activo', 1)
-        // ->whereNotIn('mesas.id_mesa', $mesas_recinto)
-        ->select('users.id as id_usuario',
-                 'rel_usuario_mesa.id_mesa as rel_idmesa', 'rel_usuario_mesa.activo as mesa_activa',
-                 'recintos.nombre as nombre_recinto', 'recintos.circunscripcion', 'recintos.distrito', 'recintos.zona',
-                 'mesas.id_mesa', 'mesas.id_recinto', 'codigo_mesas_oep', 'codigo_ajllita',
-                 'personas.telefono_celular',
-                 \DB::raw('CONCAT(personas.paterno," ",personas.materno," ",personas.nombre) as nombre_completo')
-                )
-        ->orderBy('mesas.id_mesa')
-        ->get();
-
-        
-        $evidencias = \DB::table('tipo_evidencias')
-        ->where('estado', 1)
-        ->orderBy('id')
-        ->get();
 
         return view("formularios.form_editar_persona")
-        ->with('persona', $persona)
-        ->with('usuario', $usuario)
-        ->with('circunscripciones', $circunscripciones)
-        ->with('distritos', $distritos)
-        ->with('recintos', $recintos)
-        ->with('origenes', $origenes)
-        ->with('sub_origenes', $sub_origenes)
+        ->with('personas', $personas)
         ->with('roles', $roles)
-        ->with('casas', $casas)
-        ->with('casa_campana', $casa_campana)
-        ->with('vehiculos', $vehiculos)
-        ->with('usuario_vehiculo', $usuario_vehiculo)
-        ->with('mesas_usuario', $mesas_usuario)
-        ->with('evidencias', $evidencias)
-        ;
+        ->with('data', $data);
     }
 
-    public function editar_persona(Request $request){
-        if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-            return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        }
-
-        if($request->input("nombres") == ''){
-            return 'nombres';
-        }elseif($request->paterno == "" && $request->materno == ""){
-            return 'apellido';
-        }elseif($request->input("cedula") == ''){
-            return 'nacimiento';
-        }elseif($request->input("nacimiento") == ''){
-            return 'nacimiento';
-        }elseif ($request->input("telefono") == '' && $request->input("telefono_ref") == '') {
-            return 'telefono';
-        }elseif ($request->input("direccion") == '') {
-            return 'direccion';
-        }else{}
-
-        $id_persona = $request->input("id_persona");
-        $persona = Persona::find($id_persona);
+    public function editar_persona(ValidacionPersona $request, $id){
+        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
+        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
+        // }
         
-        if ($request->input("cedula") != $persona->cedula_identidad || $request->input("complemento") != $persona->complemento_cedula) {
-            $cedulas = \DB::table('personas')
-            ->select('cedula_identidad')
-            ->where('cedula_identidad', $request->input("cedula"))
-            ->where('complemento_cedula', $request->input("complemento"))
-            ->distinct()
-            ->get();
-        }else{
-            $cedulas = [];
+        $foto = "";
+
+        if($request->file('archivo') != ""){
+            $tiempo_actual = new DateTime(date('Y-m-d H:i:s'));
+            $archivo = $request->file('archivo');
+            $mime = $archivo->getMimeType();
+            $extension=strtolower($archivo->getClientOriginalExtension());
+
+            $nuevo_nombre=$request->input("cedula_identidad")."-".$tiempo_actual->getTimestamp();
+
+            $file = $request->file('archivo');
+
+            $image = Image::make($file->getRealPath());
+            
+            //reducimos la calidad y cambiamos la dimensiones de la nueva instancia.
+            $image->resize(1280, null, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+            });
+            $image->orientate();
+
+            $rutadelaimagen="../storage/media/fotos/".$nuevo_nombre;
+
+            if ($image->save($rutadelaimagen)){
+                $foto=$rutadelaimagen;
+
+            }else{
+                $foto = "";
+            }
         }
 
-        if (count($cedulas) > 0) {
-            return "cedula_repetida";
-        }else{
-            $persona->nombre=ucwords(strtolower($request->input("nombres")));
-            $persona->paterno=ucwords(strtolower($request->input("paterno")));
-            $persona->materno=ucwords(strtolower($request->input("materno")));
-            $persona->cedula_identidad=$request->input("cedula");
-            $persona->complemento_cedula=strtoupper($request->input("complemento"));
-            $persona->expedido=$request->input("expedido");
-            $persona->fecha_nacimiento=$request->input("nacimiento");
-            $persona->telefono_celular=$request->input("telefono");
-            $persona->telefono_referencia=$request->input("telefono_ref");
-            $persona->direccion=ucwords(strtolower($request->input("direccion")));
-            
-            $persona->email=$request->input("email");
+        $persona= Persona::findOrFail($id);
+                                
+        $persona->nombre=ucwords(strtolower($request->input("nombre")));
+        $persona->paterno=ucwords(strtolower($request->input("paterno")));
+        $persona->materno=ucwords(strtolower($request->input("materno")));
+        $persona->cedula_identidad=$request->input("cedula_identidad");
+        $persona->edad=$request->input("edad");
+        $persona->sexo=$request->input("sexo");
+        $persona->especialidad=$request->input("especialidad");
+        $persona->institucion=$request->input("institucion");
+        $persona->id_medico=$request->input("medico");
+        $persona->foto=$foto;
+        $persona->activo=1;
 
-            if($persona->save())
-            {
-                return view("mensajes.msj_enviado")->with("msj","enviado_editar_persona");
-            }else{
-                return "failed";
+        if($persona->save()){
+            $usuario= User::findOrFail($persona->usuario->id);
+            if($usuario->email != $request->input("cedula_identidad")){
+                $username = $this->ObtieneUsuario($persona->id_persona);
+                
+                $usuario->name=$username;
+            
+                $usuario->email = $username;
+                $usuario->password= bcrypt($username);
             }
+
+            if($usuario->save()){
+
+                if($usuario->roles[0]->id != $request->input("rol")){
+                    $usuario->revokeRole($usuario->roles[0]->id);
+                    $usuario->assignRole($request->input("rol"));
+                }
+
+                if ($request->input("rol") != $usuario->roles[0]->id) {
+                    if($request->input("rol") == 4){
+                        $historial = new Historial;
+                        $historial->id_persona = $persona->id_persona;
+                        $historial->save();
+                    }else{
+                        $historial = Historial::where('id_persona', $persona->id_persona)->first();
+                        if($historial != null){
+                            $historial->delete();
+                        }
+                    }
+                }
+
+                return redirect('/listado_personas')->with('mensaje_exito', 'Agregado exitosamente');
+            }else{
+                return view("mensajes.mensaje_error")->with("msj","...Hubo un error al agregar ;...") ;
+            }
+
+        }else{
+            return view("mensajes.mensaje_error")->with("msj","...Hubo un error al agregar ;...") ;
         }
     }
 
@@ -1021,10 +945,37 @@ class PersonasController extends Controller
         // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
         //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
         // }
+        // dd(\Auth::user()->getRoles());
+        // dd(\Auth::user()->isRole('super_admin'));
 
-        $personas = Persona::with('usuario')
+        $personas = [];
+
+        if(\Auth::user()->isRole('super_admin')){
+            $personas = Persona::with('usuario')
             ->with('usuario.roles')
+            ->where('activo', 1)
             ->get();
+        }
+
+        if(\Auth::user()->isRole('medico')){
+            $personas = Persona::with('usuario')
+            ->with('usuario.roles')
+            ->where('id_medico', \Auth::user()->id_persona)
+            ->get();
+        }
+
+        if(\Auth::user()->isRole('paciente')){
+            $personas = Persona::with('usuario')
+            ->with('usuario.roles')
+            ->where('id_persona', \Auth::user()->id_persona)
+            ->get();
+        }
+
+
+
+
+
+
         // dd($personas);
         return view("listados.listado_personas")
         ->with('personas', $personas);

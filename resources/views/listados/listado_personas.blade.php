@@ -12,11 +12,13 @@
 		<div class="box-header">
 				<h3 class="box-title">Listado de Personas</h3>
 				<input type="hidden" id="rol_usuario" value="">
+				@role('super_admin')
 				<div class="box-tools">
                     <a href="{{route('form_agregar_persona')}}" class="btn btn-sm">
                         <i class="fa fa-fw fa-plus-circle"></i> Nuevo Registro
                     </a>
 				</div>
+				@endrole
 			
 		</div>
 		<!-- /.box-header -->
@@ -30,7 +32,7 @@
 				<th>Sexo</th>
 				<th>Rol</th>
 
-				<th>Acción</th>
+				<th>Opciones</th>
 				
 			</thead>
 			<tbody>
@@ -42,7 +44,7 @@
 						<td>{{ $item->sexo}}</td>
 						<td>{{ $item->usuario->roles[0]->description ?? ''}}</td>
 						<td>
-							<a href="{{route('opciones_persona', ['id' => $item->id_persona])}}" class="btn tooltipsC" title="Editar este registro">
+							<a href="{{route('opciones_persona', ['id' => $item->id_persona])}}" class="btn tooltipsC">
 								<i class="fa fa-edit"></i>
 							</a>
 						</td>

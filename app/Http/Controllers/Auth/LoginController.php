@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -65,16 +66,24 @@ class LoginController extends Controller
     }
 
     public function authenticated($request , $user){
+        // @role('super_admin')
+        // <a href="{{ url('listado_personas') }}" class="navbar-brand">
+        // @endrole
+        // @role('medico')
+        // <a href="{{ url('listado_personas') }}" class="navbar-brand">
+        // @endrole
+        // @role('paciente')
+        // <a href="{{route('opciones_persona', ['id' => Auth::user()->id_persona])}}" class="navbar-brand">
+        // @endrole
 
-
-        if(\Auth::user()->isRole('productor')==true){
-            return redirect()->intended('home_encuestas');
+        if(\Auth::user()->isRole('super_admin')==true){
+            return redirect()->intended('listado_personas');
         }
-        if(\Auth::user()->isRole('admin')==true){
-            return redirect()->intended('listado_usuarios');
+        if(\Auth::user()->isRole('medico')==true){
+            return redirect()->intended('listado_personas');
         }
-        if(\Auth::user()->isRole('registrador')==true){
-            return redirect()->intended('form_agregar_persona');
+        if(\Auth::user()->isRole('paciente')==true){
+            return redirect()->intended('persona/'.Auth::user()->id_persona.'/opciones');
         }
 
     }
