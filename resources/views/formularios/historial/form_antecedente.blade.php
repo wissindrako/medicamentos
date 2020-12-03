@@ -112,8 +112,8 @@
                             <div class="form-group">
                                 <div class="checkbox">
                                   <label>
-                                    <input type="checkbox" name="fuma" value="{{ old('fuma', $antecedentes->fuma ?? '') }}" {{isset($antecedentes->fuma) ? 'checked' : ''}}>
-                                    Fuma
+                                    <input type="checkbox" name="pulmonar" value="{{ old('pulmonar', $antecedentes->pulmonar ?? '') }}" {{isset($antecedentes->pulmonar) ? 'checked' : ''}}>
+                                    Fumador
                                   </label>
                                 </div>
                             </div>
@@ -132,7 +132,7 @@
                             <div class="form-group">
                                 <div class="checkbox">
                                   <label>
-                                    <input type="checkbox" name="bebidas_alcoholicas" value="{{ old('bebidas_alcoholicas', $antecedentes->bebidas_alcoholicas ?? '') }}" {{isset($antecedentes->bebidas_alcoholicas) ? 'checked' : ''}}>
+                                    <input type="checkbox" name="alcohol" value="{{ old('alcohol', $antecedentes->alcohol ?? '') }}" {{isset($antecedentes->alcohol) ? 'checked' : ''}}>
                                     Consumo de bebidas alcoholicas
                                   </label>
                                 </div>
@@ -262,7 +262,7 @@
                             <div class="form-group">
                                 <div class="checkbox">
                                   <label>
-                                    <input type="checkbox" name="presion_sanguinea" value="{{ old('presion_sanguinea', $antecedentes->presion_sanguinea ?? '') }}" {{isset($antecedentes->presion_sanguinea) ? 'checked' : ''}}>
+                                    <input type="checkbox" name="presion" value="{{ old('presion', $antecedentes->presion ?? '') }}" {{isset($antecedentes->presion) ? 'checked' : ''}}>
                                     Presión sanguínea
                                   </label>
                                 </div>

@@ -21,9 +21,9 @@
 
 			<div style="text-align:center">
 
-				<h2><b>Encuestas Cafe</b></h2>
+				<h1 class=""><b>SISTEMA EXPERTO </b></h1>
 				{{-- <h3><b>Administración </b></h3> --}}
-				<img src="{{asset('img/logopersona.png')}}" style="width:350x;height:250px;" class="centered"/>
+				<img src="{{asset('img/logo-univalle.jpeg')}}" style="width:550x;height:450px;" class="centered"/>
 			</div>
 		</div>
 	</div>

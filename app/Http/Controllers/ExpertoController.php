@@ -64,59 +64,152 @@ class ExpertoController extends Controller
         $antecedentes = [];
         $enfermedades = [];
         $alergias = [];
+        $recetas = [];
 
         $resultados = array();
+
+        //HISTORIA CLINICA
 
         if($historia){
             if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes, true);}
             else{
                 $e = array();
                 $e['premisa'] = 'Si: los antecedentes del paciente no están registrados';
-                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados';
                 array_push($resultados, $e);
             }
             if ($historia->enfermedades) {$enfermedades = array_keys(json_decode($historia->enfermedades, true));}
             else{
                 $e = array();
                 $e['premisa'] = 'Si: las enfermedades del paciente no están registradas';
-                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados';
                 array_push($resultados, $e);
             }
             if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
             else{
                 $e = array();
                 $e['premisa'] = 'Si: las alergias del paciente no están registradas';
-                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados';
                 array_push($resultados, $e);
             }
+            if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+
         }
-        
-
-        // $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
-        $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
-
-        $book = array('book2','book3','book5');  
 
         $arr_antecedentes = array_keys($antecedentes);
+        $arr_enfermedades = $enfermedades;
+        $arr_alergias = array_keys($alergias);
+        $arr_recetas = array_keys($recetas);
+
         // dd($arr_antecedentes);
-        $antecedentes_medicamentos = \DB::Table('medicamentos')
-                ->select('nombre', 'efectos', 'conclusion', 'meta')                
-                ->Where(function ($query) use($arr_antecedentes) {
-                    for ($i = 0; $i < count($arr_antecedentes); $i++){
-                        $query->orwhere('meta', 'like',  '%' . $arr_antecedentes[$i] .'%');
-                    }      
-                })->get();
-        // dd($antecedentes_medicamentos);
-        $pacientes = array();
+
+        // $medicamentos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
+        $efectos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
+
+        $medicamentos = Medicamento::where('nombre', $datos);
+
+        // $medicamentos = $medicamentos->where('meta', 'like', '%leve%')->get();
+
+        // dd($medicamentos->get());
+        // dd($medicamentos);
+
+        // $arr_antecedentes = [array('dolor','dolsdafaor','astenia')];
+        
+        if(count($medicamentos->get()) > 0){
+
+            //ANTECEDENTES
+
+            foreach ($arr_antecedentes as $value) {
+                $medicamentos = Medicamento::where('nombre', $datos);
+                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
+                $data = $medicamentos->where('meta', 'like', '%'.$value.'%')->first();
+                // dd($data);
+                if($data){
+                    $e = array();
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus antecedentes';
+                    array_push($resultados, $e);
+                }
+            }
+
+            //ENFERMEDADES
+            
+            foreach ($arr_enfermedades as $value) {
+                $medicamentos = Medicamento::where('nombre', $datos);
+                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
+                $data = $medicamentos->where('meta', 'like', '%'.$value.'%')->first();
+                // dd($data);
+                if($data){
+                    $e = array();
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus falencias registradas';
+                    array_push($resultados, $e);
+                }
+                
+            }
+
+            //ALERGIAS
+            
+            foreach ($arr_alergias as $value) {
+                $medicamentos = Medicamento::where('nombre', $datos);
+                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
+                $data = $medicamentos->where('meta', 'like', '%'.$value.'%')->first();
+                // dd($data);
+                if($data){
+                    $e = array();
+                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus falencias registradas';
+                    array_push($resultados, $e);
+                }
+                
+            }
+        }
+
+        // $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
+
+        //CONTRAINDICACIONES
+
+        // $contraindicaciones = Medicamento::where('nombre', $datos)
+        // ->where('efectos', 'Contraindicaciones');
+
+        // dd($contraindicaciones->get());
+
+        // if(count($contraindicaciones->get()) > 0){
+
+        //     foreach ($arr_antecedentes as $value) {
+        //         $contraindicaciones = Medicamento::where('nombre', $datos)
+        //         ->where('efectos', 'Efecto Secundario');
+        //         // $data = $contraindicaciones->where('meta', 'like', '%dolor%')->first();
+        //         $data = $contraindicaciones->where('meta', 'like', '%'.$value.'%')->first();
+        //         // dd($data);
+        //         if($data){
+        //             $e = array();
+        //             $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
+        //             $e['conclusion'] = $data->conclusion.' por presencia de '.$value.' en sus antecedentes';
+        //             array_push($resultados, $e);
+        //         }
+
+        //     }
+        // }
+
+        // dd($arr_antecedentes);
+        // $antecedentes_medicamentos = \DB::Table('medicamentos')
+        //         ->select('nombre', 'efectos', 'conclusion', 'meta')                
+        //         ->Where(function ($query) use($arr_antecedentes) {
+        //             for ($i = 0; $i < count($arr_antecedentes); $i++){
+        //                 $query->orwhere('meta', 'like',  '%' . $arr_antecedentes[$i] .'%');
+        //             }      
+        //         })->get();
+        // $pacientes = array();
 
         // foreach ($paciente as $key => $value) {
-            $e = array();
+            // $e = array();
 
-            $e['id'] = $paciente->id_persona;
-            $e['nombre'] = $paciente->nombre;
-            $e['materno'] = $paciente->paterno;
-            $e['paterno'] = $paciente->materno;
-            array_push($pacientes, $e);
+            // $e['id'] = $paciente->id_persona;
+            // $e['nombre'] = $paciente->nombre;
+            // $e['materno'] = $paciente->paterno;
+            // $e['paterno'] = $paciente->materno;
+            // array_push($pacientes, $e);
         // }
 
         // dd($paciente);
