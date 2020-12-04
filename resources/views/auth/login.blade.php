@@ -22,16 +22,7 @@
                     <div class="myform-top-login">
                       <br>
                       <img  src="{{ url('img/avatar.png') }} " class="img-responsive myform-img-top-center"/>
-                        {{-- <div class="myform-top-left">
-                          <img  src="{{ url('img/logo_cafe.png') }} " class="img-responsive logo" />
-                          <h3>Productores de Café y Cacao</h3>
-                          <br>
-                            <p>Digita tu usuario y contraseña:</p>
-                        </div>
-                        <div class="myform-top-right">
-                          <img  src="{{ url('img/fautapo.png') }} " class="img-responsive logo" />
-                          <!--i class="fa fa-key"></i-->
-                        </div> --}}
+
                     </div>
 
             @if (count($errors) > 0)
