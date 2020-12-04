@@ -245,31 +245,40 @@ class ExpertoController extends Controller
 
         $grados_obtenidos = Arr::pluck($resultados, 'grado');
 
-        if (max($grados_obtenidos) == 0) {
+        if(count($grados_obtenidos) > 0){
+            if (max($grados_obtenidos) == 0) {
+                $e = array();
+    
+                $e['premisa'] = $p_final;
+                $e['resultado'] = 'El medicamento presenta un Riesgo bajo o leve';
+                $e['conclusion'] = 'Se recomienda tomar el medicamento';
+                $e['grado'] = $grado_bajo;
+                array_push($resultados, $e);
+            }
+            if (max($grados_obtenidos) == 1) {
+                $e = array();
+    
+                $e['premisa'] = $p_final;
+                $e['resultado'] = 'El medicamento presenta un Riesgo moderado o de consideración';
+                $e['conclusion'] = 'Se recomienda tomar el medicamento con precaución';
+                $e['grado'] = $grado_medio;
+                array_push($resultados, $e);
+            }
+            if (max($grados_obtenidos) == 2) {
+                $e = array();
+    
+                $e['premisa'] = $p_final;
+                $e['resultado'] = 'El medicamento presenta un Riesgo alto o grave';
+                $e['conclusion'] = 'No se recomienda tomar el medicamento';
+                $e['grado'] = $grado_alto;
+                array_push($resultados, $e);
+            }
+        }else{
             $e = array();
-
             $e['premisa'] = $p_final;
-            $e['resultado'] = 'El medicamento presenta un Riesgo bajo o leve';
+            $e['resultado'] = 'El medicamento no presenta ninguna interación con el Historial Clínico del paciente';
             $e['conclusion'] = 'Se recomienda tomar el medicamento';
             $e['grado'] = $grado_bajo;
-            array_push($resultados, $e);
-        }
-        if (max($grados_obtenidos) == 1) {
-            $e = array();
-
-            $e['premisa'] = $p_final;
-            $e['resultado'] = 'El medicamento presenta un Riesgo moderado o de consideración';
-            $e['conclusion'] = 'Se recomienda tomar el medicamento con precaución';
-            $e['grado'] = $grado_medio;
-            array_push($resultados, $e);
-        }
-        if (max($grados_obtenidos) == 2) {
-            $e = array();
-
-            $e['premisa'] = $p_final;
-            $e['resultado'] = 'El medicamento presenta un Riesgo alto o grave';
-            $e['conclusion'] = 'No se recomienda tomar el medicamento';
-            $e['grado'] = $grado_alto;
             array_push($resultados, $e);
         }
 

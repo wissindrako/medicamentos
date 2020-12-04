@@ -129,12 +129,16 @@ class HistorialController extends Controller
         ->with('usuario.roles')
         ->where('id_parent', $id)
         ->get();
+        
+        $id_paciente = $id;
 
         return view("formularios.historial.form_familiares")
-        ->with('personas', $personas);
+        ->with('personas', $personas)
+        ->with('id_paciente', $id_paciente);
     }
 
     public function guardar_familiares(ValidacionFamiliar $request){
+
         $tiempo_actual = new DateTime(date('Y-m-d H:i:s'));
 
         $familiar=new Persona;
@@ -144,16 +148,15 @@ class HistorialController extends Controller
         $familiar->materno=ucwords(strtolower($request->input("materno")));
         $familiar->telefono_celular=$request->input("telefono_celular");
         $familiar->cedula_identidad=$tiempo_actual->getTimestamp();
-        $familiar->id_parent=Auth::user()->id_persona;
+        $familiar->id_parent=$request->id_paciente;
         $familiar->parentesco=ucwords(strtolower($request->input("parentesco")));
 
         $familiar->save();
 
         $persona = Persona::with('usuario')
         ->with('usuario.roles')
-        ->where('id_persona', Auth::user()->id_persona)
+        ->where('id_persona', $request->id_paciente)
         ->get();
-
 
         return view("formularios.opciones.index")
         ->with('persona', $persona);

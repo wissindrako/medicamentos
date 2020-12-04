@@ -81,6 +81,7 @@
                       
                     <form action="{{ url('guardar_familiares') }}"  method="post" id="f_enviar_agregar_persona" class="" enctype="multipart/form-data">
                       <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                      <input type="hidden" name="id_paciente" value="{{$id_paciente}}">
                       <br>
                         <div class="col-md-12">
                             <div class="form-group">

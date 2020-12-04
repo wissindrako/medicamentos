@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login Productores de Café y Cacao</title>
+    <title>Sistema Experto</title>
 
     <!-- CSS de Bootstrap -->
     <link rel="stylesheet" href="{{ url('css/bootstrap.css') }}">
