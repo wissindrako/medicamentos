@@ -40,41 +40,10 @@
 
                     <div class="myform-bottom-login">
                       
-                      <form role="form" action="{{ url('/register') }}" method="post" class="">
-                      <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <form action="{{ url('agregar_persona') }}"  method="post" id="f_enviar_agregar_persona" class="" enctype="multipart/form-data">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                        <div class="form-group">
-                            <input type="text" name="nombre" placeholder="Nombre Completo" class="form-control" value="{{ old('name') }}" >
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" name="paterno" placeholder="Apellido Paterno" class="form-control" value="{{ old('name') }}" >
-                        </div>
-                    
-                        <div class="form-group">
-                            <input type="text" name="materno" placeholder="Apellido Materno" class="form-control" value="{{ old('name') }}" >
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="ci" name="ci" placeholder="No. Carnet"  value="{{ old('telefono') }}" >
-                        </div>
-                     
-                        <div class="form-group">
-                            <input type="text" name="email" placeholder="Correo Electronico" class="form-control"  
-                            value="{{ old('email') }}" />
-                        </div>
-                        
-                        <div class="form-group">
-                        <input type="password" name="password" placeholder="Password" class="form-control" >
-                        </div>
-
-                         <div class="form-group">
-                        <input type="password" name="password_confirmation" placeholder="Repite Password" class="form-control" >
-                        </div>
-{{-- 
-                        <div class="form-group">
-                         {!! Recaptcha::render() !!}
-                        </div> --}}
+                            @include('formularios.persona.form_agregar')
 
                         <button type="submit" class="mybtn">Registrarme</button>
                       </form>
@@ -93,5 +62,9 @@
  
  </body>
 @endsection
+@section('scripts')
+    @include('layouts.partials.scripts')
+@show
 
+@include('formularios.persona.scripts')
 

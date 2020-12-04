@@ -51,7 +51,7 @@
 
           {{-- <hr> --}}
 
-          <b><i class="fa fa-circle-o margin-r-5"></i> Enfermedades</b>
+          <b><i class="fa fa-circle-o margin-r-5"></i> Falencias</b>
           <p class="text-muted">
             @forelse ($enfermedades as $item => $value)
                 {{$item}}{{$value ? ' : '.$value.', ' : ', '}}

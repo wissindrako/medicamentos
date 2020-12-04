@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use App\Persona;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
@@ -17,7 +18,24 @@ trait RegistersUsers
      */
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        $roles = [];
+
+        $personas = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('activo', 1)
+        ->get();
+
+        if (Auth::guest()) {
+            $roles = \DB::table('roles')
+            ->where('id', '>', 1)
+            ->get();
+        } else {
+            $roles = \DB::table('roles')->get();
+        }
+
+        return view("formularios.form_agregar_persona")
+        ->with('roles', $roles)
+        ->with('personas', $personas);
     }
 
     /**

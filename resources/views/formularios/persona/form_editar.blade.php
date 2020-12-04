@@ -30,6 +30,12 @@
 </div> --}}
 <div class="col-md-12">
     <div class="form-group">
+        <label >Celular</label>
+        <input type="input" name="telefono_celular" placeholder="" class="form-control" value="{{ old('telefono_celular', $data->telefono_celular ?? '') }}" pattern="[0-9]{6,9}"/>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="form-group">
         <label class="text-black">Rol</label>
         <div class="form-group bg-gray">
             @role('paciente')
@@ -68,15 +74,23 @@
 </div>
 <div class="col-md-6" id="div_edad">
     <div class="form-group">
-        <label class=" ">Edad</label>
-        <input style='line-height: initial;' type="number" name="edad" id="edad" placeholder="" min="1" max="110" class="form-control" value="{{ old('edad', $data->edad ?? '') }}" />
+        <label >Edad</label>
+        @role('paciente')
+        <input style='line-height: initial;' type="number" name="edad" id="edad" placeholder="" min="60" max="110" class="form-control" value="{{ old('edad', $data->edad ?? '') }}" required/>
+        @endrole
+        @role('medico')
+        <input style='line-height: initial;' type="number" name="edad" id="edad" placeholder="" min="20" max="110" class="form-control" value="{{ old('edad', $data->edad ?? '') }}" required/>
+        @endrole
+        @role('super_admin')
+        <input style='line-height: initial;' type="number" name="edad" id="edad" placeholder="" min="20" max="110" class="form-control" value="{{ old('edad', $data->edad ?? '') }}" required/>
+        @endrole
     </div>
 </div>
 <div class="col-md-6" id="div_sexo">
     <div class="form-group">
         <label class="text-black">Sexo</label>
         <div class="form-group bg-gray">
-            <select class="form-control" name="sexo" id="sexo">
+            <select class="form-control" name="sexo" id="sexo" required>
                 @if(!isset($data) && !old('sexo'))
                     <option value="" selected> --- SELECCIONE SU GENERO --- </option>
                     <option value="MASCULINO">MASCULINO</option>
@@ -91,7 +105,7 @@
                         <option value="MASCULINO" {{ old('sexo') == 'MASCULINO' ? 'selected' : '' }}>MASCULINO</option>
                         <option value="FEMENINO" {{ old('sexo') == 'FEMENINO' ? 'selected' : '' }}>FEMENINO</option>
                     @endif
-
+required
                 @endif
 
             </select>

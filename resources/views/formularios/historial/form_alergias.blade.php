@@ -47,8 +47,9 @@
                         <input type="hidden" name="id_historial" value="{{$historia->id}}">
                         <div class="col-md-12">
                           <div class="form-group">
+                            <br>
                             <label>Alergias del paciente</label>
-                            <select class="form-control select2" multiple="multiple" name="alergias[]" data-placeholder="Select a State"
+                            <select class="form-control select2" multiple="multiple" name="alergias[]" data-placeholder="Buscar"
                                     style="width: 100%;">
                                     @foreach ($medicamentos as $item)
                                         {{-- <option value={{$item->nombre}}>{{$item->nombre}}</option>    --}}

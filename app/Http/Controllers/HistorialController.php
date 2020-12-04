@@ -14,11 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class HistorialController extends Controller
 {
     public function form_antecedentes($id){
-        //carga el formulario para agregar un nueva persona
 
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
         
         $historia = Historial::where('id_persona', $id)->first();
 
@@ -52,11 +48,7 @@ class HistorialController extends Controller
     }
 
     public function form_enfermedades($id){
-        //carga el formulario para agregar un nueva persona
 
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
         
         $historia = Historial::where('id_persona', $id)->first();
 
@@ -90,11 +82,7 @@ class HistorialController extends Controller
     }
 
     public function form_alergias($id){
-        //carga el formulario para agregar un nueva persona
-
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
+ 
         
         $historia = Historial::where('id_persona', $id)->first();
 
@@ -125,6 +113,9 @@ class HistorialController extends Controller
         if($request->alergias){
             $historia->alergias = json_encode($request->alergias);
             $historia->save();
+        }else{
+            $historia->alergias = NULL;
+            $historia->save();
         }
 
         return view("formularios.opciones.index")
@@ -132,11 +123,7 @@ class HistorialController extends Controller
     }
 
     public function form_familiares($id){
-        //carga el formulario para agregar un nueva persona
-
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
+ 
         
         $personas = Persona::with('usuario')
         ->with('usuario.roles')
@@ -173,12 +160,7 @@ class HistorialController extends Controller
     }
 
     public function form_recetas($id){
-        //carga el formulario para agregar un nueva persona
-
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
-        
+ 
         $historia = Historial::where('id_persona', $id)->first();
 
         $recetas  = json_decode($historia->recetas);

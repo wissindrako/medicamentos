@@ -5,13 +5,17 @@
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuracion <span class="caret"></span></a>
           <ul class="dropdown-menu">
-                  <li><a href="{{ url('listado_usuarios') }}">Roles</a></li>
+            <li><a href="{{ url('listado_usuarios') }}"><i class="fa fa-list-alt"></i>Usuarios</a></li>
+            @if (Auth::user()->persona)
+            <li><a href="{{route('form_editar_persona', ['id' => Auth::user()->persona->id_persona])}}"><i class="fa fa-user"></i> Mi perfil</a></li>
+            @endif
+            
               {{-- <li><a href="{{ url('listado_empresas') }}">Usuarios</a></li> --}}
           </ul>
       </li>
       @endrole
-      @role('admin')
-      <li><a href="{{ url('cliente_cargar_datos') }}"><i class="fa fa-server"></i> Subir Datos</a></li>
+      @role('medico')
+      <li><a href="{{route('form_editar_persona', ['id' => Auth::user()->persona->id_persona])}}"><i class="fa fa-user"></i> Mi perfil</a></li>
       @endrole
       {{-- <li><a href="{{ url('mapa') }}"><i class="fa fa-map-marker"></i> Mapa</a></li>
       <li><a href="{{ url('quienes_somos') }}"><i class="fa fa-info-circle"></i> Quienes Somos</a></li>

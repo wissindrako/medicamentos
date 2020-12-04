@@ -27,7 +27,8 @@
 		  <table id="tabla_personas" class="table table-hover table-striped table-bordered">
 			<thead>
 				<th>Nombre</th>
-				<th>Cedula</th>
+				<th>CI</th>
+				<th>Celular</th>
 				<th>Edad</th>
 				<th>Sexo</th>
 				<th>Rol</th>
@@ -40,11 +41,12 @@
 					<tr>
 						<td>{{ $item->nombre}} {{$item->paterno}} {{$item->materno}}</td>
 						<td>{{ $item->cedula_identidad}}</td>
+						<td>{{ $item->telefono_celular}}</td>
 						<td>{{ $item->edad}}</td>
 						<td>{{ $item->sexo}}</td>
 						<td>{{ $item->usuario->roles[0]->description ?? ''}}</td>
 						<td>
-							<a href="{{route('opciones_persona', ['id' => $item->id_persona])}}" class="btn tooltipsC">
+							<a href="{{route('opciones_persona', ['id' => $item->id_persona])}}">
 								<i class="fa fa-edit"></i>
 							</a>
 						</td>

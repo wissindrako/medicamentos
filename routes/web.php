@@ -30,15 +30,11 @@ Route::get('form_pruebas', 'PruebasController@form_pruebas');
 Route::get('log_conexiones', 'PruebasController@log_conexiones');
 
 Auth::routes();
+Route::get('form_agregar_persona', 'PersonasController@form_agregar_persona')->name('form_agregar_persona');
+Route::post('agregar_persona', 'PersonasController@agregar_persona');
 
 Route::group(['middleware' => 'auth'], function () {
 
-    // Route::get('experto', 'ExpertoController@home_encuestas')->name('experto');
-
-    // Route::resource('listado_empresas', 'DirectorioController@listado_empresas');
-    // Route::get('experto', function (){
-    //     return view('formularios.sistema_experto.index');
-    // })->name('experto');
 
     Route::get('persona/{id}/opciones', 'ExpertoController@form_opciones')->name('opciones_persona');
     Route::get('persona/{id}/antecedentes', 'HistorialController@form_antecedentes')->name('antecedentes_persona');
@@ -55,15 +51,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('persona/{id}/experto', 'ExpertoController@index')->name('experto');
 
     Route::get('persona/{id}/motorInferencia/{datos}', 'ExpertoController@motorInferencia')->name('motor_inferencia');
-    // Route::get('/listado_personas', function (){
-    //     return view('listado.listado_personas');
-    // })->name('admin.listado_personas');
 
     Route::get('/home', 'HomeController@index');
 
-
-    Route::get('form_agregar_persona', 'PersonasController@form_agregar_persona')->name('form_agregar_persona');
-    Route::post('agregar_persona', 'PersonasController@agregar_persona');
 
     Route::get('form_editar_persona/{id}', 'PersonasController@form_editar_persona')->name('form_editar_persona');
     Route::post('editar_persona/{id}', 'PersonasController@editar_persona')->name('editar_persona');
@@ -80,9 +70,6 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('listado_personas_asignacion', 'PersonasController@listado_personas_asignacion');
     Route::resource('buscar_persona_asignacion', 'PersonasController@buscar_persona_asignacion');
-
-
-
 
 
     Route::get('/listado_usuarios', 'UsuariosController@listado_usuarios');
@@ -111,8 +98,5 @@ Route::group(['middleware' => 'auth'], function () {
 
     //Usuarios
     Route::get('form_agregar_usuario', 'UsuariosController@form_agregar_usuario');
-    Route::get('reporte_usuarios', 'UsuariosController@reporte_usuarios');
-
-
 
 });

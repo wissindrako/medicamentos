@@ -7,17 +7,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Historial;
 use App\Models\Medicamento;
 use App\Persona;
+use Illuminate\Support\Arr;
 
 class ExpertoController extends Controller
 {
-    public function index($id){
-        //carga el formulario para agregar un nueva persona
 
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
-        
-        
+    public function index($id){
+        //Carga el formulario de consulta del Sistema Experto
+        // Datos Personales 
+        // Historia Clínica
+        // Experto
+       
         $paciente = Persona::findOrFail($id);
         $historia = Historial::where('id_persona', $paciente->id_persona)->first();
         $antecedentes = [];
@@ -29,6 +29,8 @@ class ExpertoController extends Controller
         ->where('id_parent', $id)
         ->get();
 
+        $medicamentos = Medicamento::orderBy('nombre', 'asc')->distinct()->pluck('nombre');
+
         if($historia){
             if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
             if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
@@ -36,15 +38,14 @@ class ExpertoController extends Controller
             if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
         }
         // return view('admin.user.editar', compact('data', 'roles'));
-        return view('formularios.sistema_experto.index', compact('paciente', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares'));
+        return view('formularios.sistema_experto.index', 
+        compact(
+            'paciente', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
+        ));
     }
     
     public function form_opciones($id){
-        //carga el formulario para agregar un nueva persona
-
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
+        //Carga el formulario para el llenado de Opciones de la Historia Clínica
         
         $persona = Persona::with('usuario')
         ->with('usuario.roles')
@@ -56,142 +57,183 @@ class ExpertoController extends Controller
     }
 
     public function motorInferencia($id, $datos){
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
+
+        //RESULTADOS DEL MOTOR DE INFERENCIA
+
+        // Definiendo grado de respuesta al medicamento
+        $grado_alto = 2;
+        $grado_medio = 1;
+        $grado_bajo = 0;
+
+      //Premisas Antecedentes
+        $p_antecedentes_1 = 'El registro de antecedentes permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
+        $p_antecedentes_2 = 'Si alguno de los antecedentes interactua con los medicamentos, podrían ocasionar efectos secundarios, contraindicaciones e interacciones';
+
+        $p_enfermedades_1 = 'El registro de falencias permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
+        $p_enfermedades_2 = 'Si alguna de las enfermedades interactua con los medicamentos, podrían ocasionar efectos secundarios, contraindicaciones e interacciones';
+
+        $p_alergias_1 = 'El registro de alergias permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
+        $p_alergias_2 = 'Si alguna de las alergias interactua con el nuevo medicamento, podría ocasionar efectos secundarios, contraindicaciones e interacciones';
+
+        $p_recetas_1 = 'El registro de medicamentos en consumo permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
+        $p_recetas_2 = 'Si alguno de los medicamentos que consume interactua con el nuevo medicamento, podría ocasionar efectos secundarios, contraindicaciones, sobredosis e interacciones';
+
+        $p_final = 'El medicamento puede contraer interacciones respecto a la Historia Clinica del paciente.';
+
+
+        //Obteniendo el paciente o adulto mayor actual
         $paciente = Persona::findOrFail($id);
+
+        //Obteniendo su Historial Clínico
         $historia = Historial::where('id_persona', $paciente->id_persona)->first();
+
+        // Creando variables para el Historial
         $antecedentes = [];
         $enfermedades = [];
         $alergias = [];
         $recetas = [];
 
+        // Creando variable para el resultado final
         $resultados = array();
 
-        //HISTORIA CLINICA
+        //INFERENCIA SOBRE HISTORIA CLINICA
 
         if($historia){
+            //Verificando si existen antecedentes
             if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes, true);}
             else{
                 $e = array();
-                $e['premisa'] = 'Si: los antecedentes del paciente no están registrados';
-                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados';
+                $e['premisa'] = $p_antecedentes_1;
+                $e['resultado'] = 'No hay registro de antecedentes';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados.';
+                $e['grado'] = $grado_bajo;
                 array_push($resultados, $e);
             }
+            //Verificando si existen enfermedades
             if ($historia->enfermedades) {$enfermedades = array_keys(json_decode($historia->enfermedades, true));}
             else{
                 $e = array();
-                $e['premisa'] = 'Si: las enfermedades del paciente no están registradas';
-                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados';
+                $e['premisa'] = $p_enfermedades_1;
+                $e['resultado'] = 'No hay registro de enfermedades';;
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados.';
+                $e['grado'] = $grado_bajo;
                 array_push($resultados, $e);
             }
+            //Verificando si existen alergias
             if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
             else{
                 $e = array();
-                $e['premisa'] = 'Si: las alergias del paciente no están registradas';
-                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados';
+                $e['premisa'] = $p_alergias_1;
+                $e['resultado'] = 'No hay registro de alergias';
+                $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados.';
+                $e['grado'] = $grado_bajo;
                 array_push($resultados, $e);
             }
+            // Verificando si existen medicamentos
             if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
             else{$recetas = [];}
 
         }
 
+        //Dando formato de arreglos a las variables de la historia clinica
         $arr_antecedentes = array_keys($antecedentes);
         $arr_enfermedades = $enfermedades;
         $arr_alergias = $alergias;
         $arr_recetas = $recetas;
 
-        // dd($arr_antecedentes);
-
         // $medicamentos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
-        $efectos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
+        // $efectos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
 
+        //Obteniendo el medicamento consultado
         $medicamentos = Medicamento::where('nombre', $datos);
-
-        // $medicamentos = $medicamentos->where('meta', 'like', '%leve%')->get();
-
-        // dd($medicamentos->get());
-        // dd($medicamentos);
-
-        // $arr_antecedentes = [array('dolor','dolsdafaor','astenia')];
         
+        // Verificando que existe el medicamento
         if(count($medicamentos->get()) > 0){
 
-            //ANTECEDENTES
-
+            //BUSCANDO ANTECEDENTES QUE INFIEREN CON EL MEDICAMENTO
             foreach ($arr_antecedentes as $value) {
                 $medicamentos = Medicamento::where('nombre', $datos);
-                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
-                $data = $medicamentos->where('meta', 'like', '%'.$value.'%')->first();
-                // dd($data);
-                if($data){
+                
+                //Almacenando resultados de la metadata obtenida
+                $meta = $medicamentos->where('meta', 'like', '%'.$value.'%')->get();
+                
+                // Incluyendo a los resultados
+                foreach ($meta as $key => $data) {
+
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
+                    $e['premisa'] = $p_antecedentes_2;
+                    $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
                     $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus antecedentes registrados en su Historia Clínica.';
+                    $e['grado'] = $this->ObtenerGrado($data->conclusion);
                     array_push($resultados, $e);
                 }
             }
 
-            //ENFERMEDADES
-            
+
+            //BUSCANDO FALENCIAS QUE INFIEREN CON EL MEDICAMENTO
+
             foreach ($arr_enfermedades as $value) {
                 $medicamentos = Medicamento::where('nombre', $datos);
-                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
-                $data = $medicamentos->where('meta', 'like', '%'.$value.'%')->first();
-                // dd($data);
-                if($data){
+
+                //Almacenando resultados de la metadata obtenida
+                $meta = $medicamentos->where('meta', 'like', '%'.str_replace('_', ' ', $value).'%')->get();
+
+                // Incluyendo a los resultados
+                foreach ($meta as $key => $data) {
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
-                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus falencias registradas en su Historia Clínica.';
+                    $e['premisa'] = $p_enfermedades_2;
+                    $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
+                    $e['conclusion'] = $data->conclusion.' por presencia de "'.str_replace('_', ' ', $value).'" en sus falencias registradas en su Historia Clínica.';
+                    $e['grado'] = $this->ObtenerGrado($data->conclusion);
                     array_push($resultados, $e);
                 }
                 
             }
 
-            //ALERGIAS
+            //BUSCANDO ALERGIAS QUE INFIEREN CON EL MEDICAMENTO
             
             foreach ($arr_alergias as $value) {
-                $medicamentos = Medicamento::where('nombre', $datos);
-                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
-                $data = $medicamentos->where('nombre', 'like', '%'.$value.'%')->first();
-                // dd($data);
-                if($data){
+                $meta = Medicamento::where('nombre', $datos)->first();
+
+                if($meta->nombre == $value){
+                    
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "Interacciones"';
-                    $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en sus alergias registradas en su Historia Clínica.';
+                    $e['premisa'] = $p_alergias_2;
+                    $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "Interacciones"';
+                    $e['conclusion'] = 'Las alergias causadas por "'.$value.'" podría ser de gravedad.';
+                    $e['grado'] = $e['grado'] = $grado_alto;
                     array_push($resultados, $e);
                 }
-                
             }
 
-            //RECETAS
+            //BUSCANDO MEDICAMENTO QUE INFIEREN CON EL NUEVO MEDICAMENTO
 
             foreach ($arr_recetas as $value) {
-                $medicamentos = Medicamento::where('nombre', $datos);
-                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
-                $data = $medicamentos->where('nombre', 'like', '%'.$value.'%')->first();
-                // dd($data);
-                if($data){
+                $meta = Medicamento::where('nombre', $datos)->first();
+
+                if($meta->nombre == $value){
+                    
                     $e = array();
-                    $e['premisa'] = 'El medicamento: '.$data->nombre.' se encuentra en los medicamentos que consume';
-                    $e['conclusion'] = 'Su administración podría causar "Sobredosis" si aumenta el tiempo y cantidad recomendada por su Médico.';
+                    $e['premisa'] = $p_recetas_2;
+                    $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "Interacciones"';
+                    $e['conclusion'] = 'Las interaciones por "'.$value.'" podrían causar sobredosis.';
+                    $e['grado'] = $e['grado'] = $grado_alto;
                     array_push($resultados, $e);
                 }
-                
             }
-            // dd($arr_recetas);
 
             foreach ($arr_recetas as $value) {
-                // $medicamentos = Medicamento::all();
-                // $data = $medicamentos->where('meta', 'like', '%dolor%')->first();
-                $meta = Medicamento::where('meta', 'like', '%'.$value.'%')->get();
 
+                $meta = Medicamento::where('nombre', $datos)
+                ->where('meta', 'like', '%'.$value.'%')->get();
+                
                 foreach ($meta as $key => $data) {
                     if($data){
                         $e = array();
-                        $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
+                        $e['premisa'] = $p_recetas_2;
+                        $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'"';
                         $e['conclusion'] = $data->conclusion.' por presencia de "'.$value.'" en los medicamentos que consume según su Historia Clínica.';
+                        $e['grado'] = $this->ObtenerGrado($data->conclusion);
                         array_push($resultados, $e);
                     }
                 }
@@ -201,56 +243,67 @@ class ExpertoController extends Controller
 
         }
 
-        // $antecedentes_medicamentos = Medicamento::where('meta', 'like', '%'.$datos.'%')->get();
+        $grados_obtenidos = Arr::pluck($resultados, 'grado');
 
-        //CONTRAINDICACIONES
+        if (max($grados_obtenidos) == 0) {
+            $e = array();
 
-        // $contraindicaciones = Medicamento::where('nombre', $datos)
-        // ->where('efectos', 'Contraindicaciones');
+            $e['premisa'] = $p_final;
+            $e['resultado'] = 'El medicamento presenta un Riesgo bajo o leve';
+            $e['conclusion'] = 'Se recomienda tomar el medicamento';
+            $e['grado'] = $grado_bajo;
+            array_push($resultados, $e);
+        }
+        if (max($grados_obtenidos) == 1) {
+            $e = array();
 
-        // dd($contraindicaciones->get());
+            $e['premisa'] = $p_final;
+            $e['resultado'] = 'El medicamento presenta un Riesgo moderado o de consideración';
+            $e['conclusion'] = 'Se recomienda tomar el medicamento con precaución';
+            $e['grado'] = $grado_medio;
+            array_push($resultados, $e);
+        }
+        if (max($grados_obtenidos) == 2) {
+            $e = array();
 
-        // if(count($contraindicaciones->get()) > 0){
-
-        //     foreach ($arr_antecedentes as $value) {
-        //         $contraindicaciones = Medicamento::where('nombre', $datos)
-        //         ->where('efectos', 'Efecto Secundario');
-        //         // $data = $contraindicaciones->where('meta', 'like', '%dolor%')->first();
-        //         $data = $contraindicaciones->where('meta', 'like', '%'.$value.'%')->first();
-        //         // dd($data);
-        //         if($data){
-        //             $e = array();
-        //             $e['premisa'] = 'El medicamento: '.$data->nombre.' presenta "'.$data->efectos.'".';
-        //             $e['conclusion'] = $data->conclusion.' por presencia de '.$value.' en sus antecedentes';
-        //             array_push($resultados, $e);
-        //         }
-
-        //     }
-        // }
-
-        // dd($arr_antecedentes);
-        // $antecedentes_medicamentos = \DB::Table('medicamentos')
-        //         ->select('nombre', 'efectos', 'conclusion', 'meta')                
-        //         ->Where(function ($query) use($arr_antecedentes) {
-        //             for ($i = 0; $i < count($arr_antecedentes); $i++){
-        //                 $query->orwhere('meta', 'like',  '%' . $arr_antecedentes[$i] .'%');
-        //             }      
-        //         })->get();
-        // $pacientes = array();
-
-        // foreach ($paciente as $key => $value) {
-            // $e = array();
-
-            // $e['id'] = $paciente->id_persona;
-            // $e['nombre'] = $paciente->nombre;
-            // $e['materno'] = $paciente->paterno;
-            // $e['paterno'] = $paciente->materno;
-            // array_push($pacientes, $e);
-        // }
-
-        // dd($paciente);
+            $e['premisa'] = $p_final;
+            $e['resultado'] = 'El medicamento presenta un Riesgo alto o grave';
+            $e['conclusion'] = 'No se recomienda tomar el medicamento';
+            $e['grado'] = $grado_alto;
+            array_push($resultados, $e);
+        }
 
         return json_encode($resultados);
+    }
+
+    public function ObtenerGrado ($conclusion)
+    {
+        $grado_alto = 2;
+        $grado_medio = 1;
+        $grado_bajo = 0;
+
+        $grado = $grado_medio;
+
+        // Definiendo lista de grados
+        $lista_grado_alto = ['alto', 'Alto', 'Aumenta', 'grave', 'Grave', 'potencia', 'Potencia'];
+        $lista_grado_bajo = ['bajo', 'Bajo', 'leve', 'Leve', 'menor', 'Menor'];
+
+        $cont_grado_bajo = 0;
+        $cont_grado_alto = 0;
+
+        foreach ($lista_grado_bajo as $key => $value) {
+            if(strpos($conclusion, $value) !== false){ $cont_grado_bajo = $cont_grado_bajo + 1; }
+        }
+        foreach ($lista_grado_alto as $key => $value) {
+            if(strpos($conclusion, $value) !== false){ $cont_grado_alto = $cont_grado_alto + 1; }
+        }
+        if($cont_grado_bajo > 0){
+            $grado = $grado_bajo;
+        }
+        if($cont_grado_alto > 0){
+            $grado = $grado_alto;
+        }
+        return $grado;
     }
 
 }

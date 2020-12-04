@@ -15,7 +15,7 @@
 
 <!-- AdminLTE App -->
 <script src="{{ asset('/js/app.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('/js/ajllita.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/js/sistema.js') }}" type="text/javascript"></script>
 
 {{-- Cuenta regresiva --}}
 <script src="{{ asset('/js/countdown.js') }}" type="text/javascript"></script>

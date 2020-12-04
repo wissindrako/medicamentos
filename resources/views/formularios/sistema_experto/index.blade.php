@@ -19,13 +19,24 @@
                     <div class="box-header with-border">
                       <h3 class="box-title"><b>Sistema Experto</b></h3>
                       <hr>
-                        <div class="form-group margin-bottom-none">
-                          <div class="col-sm-12">
-                            <label for="">Medicamento</label>
-                            <input class="form-control input-lg" id="dato" placeholder="Response">
-                          </div>
-                          <div class="col-sm-12">
-                            <button onclick="consultar()" class="btn btn-info pull-right btn-block btn-lg">Send</button>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="">Medicamento</label>
+                              
+                              <select class="form-control input-lg select2" id="dato" style="width: 100%;">
+                                <option selected="selected" disabled>Buscar</option>
+                                @foreach ($medicamentos as $item)
+                                <option>{{$item}}</option>
+                                @endforeach
+                              </select>
+                            </div>
+                            <!-- /.form-group -->
+                            <div class="form-group">
+                              <br>
+                              <button onclick="consultar()" class="btn btn-info pull-right btn-block btn-lg">Consultar</button>
+                            </div>
+                            <!-- /.form-group -->
                           </div>
                         </div>
 
@@ -40,7 +51,9 @@
                               <thead>
                               <tr>
                                   <th>Premisa</th>
+                                  <th>Resultado</th>
                                   <th>Conclusión</th>
+                                  <th></th>
                               </tr>
                               </thead>
                               <tbody>

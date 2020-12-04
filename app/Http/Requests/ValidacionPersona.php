@@ -32,6 +32,7 @@ class ValidacionPersona extends FormRequest
                 'paterno' => 'required_without:materno',
                 'materno' => 'required_without:paterno',
                 'cedula_identidad' => 'required|unique:users,email,' . $persona->usuario->id,
+                'telefono_celular' => 'required',
                 'rol' => 'required'
             ];
         } else {
@@ -40,6 +41,7 @@ class ValidacionPersona extends FormRequest
                 'paterno' => 'required_without:materno',
                 'materno' => 'required_without:paterno',
                 'cedula_identidad' => 'required|unique:personas,cedula_identidad',
+                'telefono_celular' => 'required',
                 'rol' => 'required'
             ];
         }

@@ -104,7 +104,7 @@
                     </ul>
                 </li> --}}
                 @if (Auth::guest())
-                    <li><a href="{{ url('/register') }}">{{ trans('adminlte_lang::message.register') }}</a></li>
+                    {{-- <li><a href="{{ url('/register') }}">{{ trans('adminlte_lang::message.register') }}</a></li> --}}
                     <li><a href="{{ url('/login') }}">{{ trans('adminlte_lang::message.login') }}</a></li>
                 @else
                     <!-- User Account Menu -->
@@ -122,12 +122,7 @@
                         <ul class="dropdown-menu">
                             <!-- The user image in the menu -->
                             <li class="user-header">
-                                {{-- @foreach ($personas as $persona)
-                                @if ( $persona->ci == Auth::user()->ci)
-                                            <!-- Status -->
-                                    <p> {{ $persona->unidad }}</p>
-                                        @endif
-                                @endforeach --}}
+
                                 <p>
                                     {{ Auth::user()->name }}
                                     <small><script>

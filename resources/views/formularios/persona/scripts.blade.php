@@ -29,23 +29,9 @@
         $("#div_medico").hide();
         document.getElementById("medico").required = false;
     }
-    
-    if ($("#edad").val() != "" && $("#edad").val() != 0) {
-        $("#div_edad").show();
-    } else {
-        $("#div_edad").hide();
-    }
-        
-    if ($("#sexo").val() != "") {
-        $("#div_sexo").show();
-    } else {
-        $("#div_sexo").hide();
-    }
-            
-   
+
     $("#rol_slug").change(function(){
-        
-        
+
         //id obtenido de la base de datos "campo : slug"
         var rol_slug = $("#rol_slug").val();
         // alertify.success(rol_slug);
@@ -54,16 +40,11 @@
             $("#div_especialidad").show();
             $("#div_medico").hide();
             document.getElementById("medico").value = "";
-            $("#div_edad").hide();
-            document.getElementById("edad").value = "";
-            $("#div_sexo").hide();
-            document.getElementById("sexo").value = "";
 
             document.getElementById("institucion").required = true;
             document.getElementById("especialidad").required = true;
             document.getElementById("medico").required = false;
-            document.getElementById("edad").required = false;
-            document.getElementById("sexo").required = false;
+
         }else if(rol_slug == '1'){ //Administrador
             $("#div_institucion").hide();
             document.getElementById("institucion").value = "";
@@ -71,16 +52,11 @@
             document.getElementById("especialidad").value = "";
             $("#div_medico").hide();
             document.getElementById("medico").value = "";
-            $("#div_edad").hide();
-            document.getElementById("edad").value = "";
-            $("#div_sexo").hide();
-            document.getElementById("sexo").value = "";
 
             document.getElementById("institucion").required = false;
             document.getElementById("especialidad").required = false;
             document.getElementById("medico").required = false;
-            document.getElementById("edad").required = false;
-            document.getElementById("sexo").required = false;
+
 
         }else{
             $("#div_institucion").hide();
@@ -88,13 +64,11 @@
             $("#div_especialidad").hide();
             document.getElementById("especialidad").value = "";
             $("#div_medico").show();
-            $("#div_edad").show();
-            $("#div_sexo").show();
+
             document.getElementById("institucion").required = false;
             document.getElementById("especialidad").required = false;
             document.getElementById("medico").required = true;
-            document.getElementById("edad").required = true;
-            document.getElementById("sexo").required = true;
+
         }
     });
   

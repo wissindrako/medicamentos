@@ -17,7 +17,7 @@
                      <div class="myform-top">
                         <div class="myform-top-left">
                            {{-- <img  src="" class="img-responsive logo" /> --}}
-                          <h3>Agregar Enfermedades del Paciente</h3>
+                          <h3>Agregar Falencias del Paciente</h3>
                             <p>Por favor seleccione las opciones si es caso</p>
                         </div>
                         <div class="myform-top-right">
