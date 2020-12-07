@@ -19,6 +19,7 @@ class ExpertoController extends Controller
         // Experto
        
         $paciente = Persona::findOrFail($id);
+        $medico = Persona::findOrFail($paciente->id_medico);
         $historia = Historial::where('id_persona', $paciente->id_persona)->first();
         $antecedentes = [];
         $enfermedades = [];
@@ -40,7 +41,7 @@ class ExpertoController extends Controller
         // return view('admin.user.editar', compact('data', 'roles'));
         return view('formularios.sistema_experto.index', 
         compact(
-            'paciente', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
+            'paciente', 'medico', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
         ));
     }
     
@@ -52,8 +53,31 @@ class ExpertoController extends Controller
         ->where('id_persona', $id)
         ->get();
 
-        return view("formularios.opciones.index")
-        ->with('persona', $persona);
+        $paciente = Persona::findOrFail($id);
+        $medico = Persona::find($paciente->id_medico);
+        $historia = Historial::where('id_persona', $paciente->id_persona)->first();
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $id)
+        ->get();
+
+        $medicamentos = Medicamento::orderBy('nombre', 'asc')->distinct()->pluck('nombre');
+
+        if($historia){
+            if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+            if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+            if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+            if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+        }
+
+        return view("formularios.opciones.index", 
+        compact(
+            'persona', 'paciente', 'medico', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
+        ));
     }
 
     public function motorInferencia($id, $datos){
@@ -144,13 +168,13 @@ class ExpertoController extends Controller
         // $medicamentos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
         // $efectos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
 
-        //Obteniendo el medicamento consultado
+        // Obteniendo el medicamento consultado
         $medicamentos = Medicamento::where('nombre', $datos);
         
         // Verificando que existe el medicamento
         if(count($medicamentos->get()) > 0){
 
-            //BUSCANDO ANTECEDENTES QUE INFIEREN CON EL MEDICAMENTO
+            //CONSULTANDO ANTECEDENTES QUE INFIEREN CON EL MEDICAMENTO
             foreach ($arr_antecedentes as $value) {
                 $medicamentos = Medicamento::where('nombre', $datos);
                 
@@ -170,7 +194,7 @@ class ExpertoController extends Controller
             }
 
 
-            //BUSCANDO FALENCIAS QUE INFIEREN CON EL MEDICAMENTO
+            //CONSULTANDO FALENCIAS QUE INFIEREN CON EL MEDICAMENTO
 
             foreach ($arr_enfermedades as $value) {
                 $medicamentos = Medicamento::where('nombre', $datos);
@@ -190,7 +214,7 @@ class ExpertoController extends Controller
                 
             }
 
-            //BUSCANDO ALERGIAS QUE INFIEREN CON EL MEDICAMENTO
+            //CONSULTANDO ALERGIAS QUE INFIEREN CON EL MEDICAMENTO
             
             foreach ($arr_alergias as $value) {
                 $meta = Medicamento::where('nombre', $datos)->first();
@@ -206,7 +230,7 @@ class ExpertoController extends Controller
                 }
             }
 
-            //BUSCANDO MEDICAMENTO QUE INFIEREN CON EL NUEVO MEDICAMENTO
+            //CONSULTANDO MEDICAMENTO QUE INFIEREN CON EL NUEVO MEDICAMENTO
 
             foreach ($arr_recetas as $value) {
                 $meta = Medicamento::where('nombre', $datos)->first();
@@ -221,6 +245,8 @@ class ExpertoController extends Controller
                     array_push($resultados, $e);
                 }
             }
+
+            // CONSULTANDO SI EL NUEVO MEDICAMENTO INFIERE CON LOS MEDICAMENTOS QUE CONSUME EL PACIENTE
 
             foreach ($arr_recetas as $value) {
 
@@ -243,6 +269,7 @@ class ExpertoController extends Controller
 
         }
 
+        // Obteniendo total de grados de riesgo obtenidos
         $grados_obtenidos = Arr::pluck($resultados, 'grado');
 
         if(count($grados_obtenidos) > 0){
@@ -285,6 +312,7 @@ class ExpertoController extends Controller
         return json_encode($resultados);
     }
 
+    //Verificando si el medicamento tuviese un Grado Alto o Bajo de riesgo
     public function ObtenerGrado ($conclusion)
     {
         $grado_alto = 2;

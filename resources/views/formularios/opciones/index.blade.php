@@ -12,7 +12,12 @@
     <div class="" >
         <div class="container">
             <div class="row">
-              <div class="col-sm-8 col-sm-offset-2 myform-cont" >
+                @if($persona[0]->usuario->roles[0]->slug == 'paciente')
+                @include('formularios.sistema_experto.datos')
+                <div class="col-md-7" >
+                @else
+                <div class="col-sm-8 col-sm-offset-2 myform-cont" >
+                @endif
 
 									@if(session()->has('mensaje_exito'))
 										<div class="alert alert-success">
@@ -27,7 +32,6 @@
 
                  <div class="myform-top">
                     <div class="myform-top-left">
-                       {{-- <img  src="" class="img-responsive logo" /> --}}
                       <h3>Opciones</h3>
                         <p>Por favor pulse sobre la cada uno de los botones para llenar las diferentes opciones</p>
                     </div>
@@ -68,16 +72,12 @@
                     <div class="col-md-12">
                         <div class="myform-bottom">
                             <hr>
-                            
+                            @if($persona[0]->usuario->roles[0]->slug == 'super_admin' || $persona[0]->usuario->roles[0]->slug == 'medico')
                             <div class="row">
-                                <div class="col-md-2">
-                                    <i class="fa fa-book margin-r-5"></i><b>{{$persona[0]->usuario->roles[0]->description}}</b>
-                                </div>
-                                <div class="col-md-1"><b>:</b></div>
-                                <div class="col-md-8">
+                                    <i class="fa fa-book margin-r-5"></i><b>{{$persona[0]->usuario->roles[0]->description}}: </b>
                                     {{$persona[0]->nombre}} {{$persona[0]->paterno}} {{$persona[0]->materno}}
-                                </div>
                             </div>
+                            @endif
                             <hr>
                             <div class="row">
 

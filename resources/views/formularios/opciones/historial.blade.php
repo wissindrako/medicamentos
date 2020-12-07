@@ -5,13 +5,11 @@
         <div class="inner">
             <h2><b>Antecedentes</b></h2>
             <br>
-            {{-- <p>User Registrations</p> --}}
         </div>
         <div class="icon">
             <i class="fa fa-ambulance"></i>
         </div>
         <br>
-        {{-- href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i> --}}
         </div>
     </div>
 </a>
@@ -30,7 +28,6 @@
             <i class="fa fa-heartbeat"></i>
         </div>
         <br>
-        {{-- href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i> --}}
         </div>
     </div>
 </a>
@@ -41,13 +38,11 @@
         <div class="inner">
             <h2><b>Alergias</b></h2>
             <br>
-            {{-- <p>User Registrations</p> --}}
         </div>
         <div class="icon">
             <i class="fa fa-medkit"></i>
         </div>
         <br>
-        {{-- href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i> --}}
         </div>
     </div>
 </a>
@@ -61,13 +56,11 @@
         <div class="inner">
             <h2><b>Familiares</b></h2>
             <br>
-            {{-- <p>User Registrations</p> --}}
         </div>
         <div class="icon">
             <i class="fa fa-users"></i>
         </div>
         <br>
-        {{-- href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i> --}}
         </div>
     </div>
 </a>
@@ -78,13 +71,11 @@
         <div class="inner">
             <h2><b>Recetas</b></h2>
             <br>
-            {{-- <p>User Registrations</p> --}}
         </div>
         <div class="icon">
             <i class="fa fa-list-alt"></i>
         </div>
         <br>
-        {{-- href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i> --}}
         </div>
     </div>
 </a>
@@ -98,13 +89,11 @@
         <div class="inner">
             <h2><b>Sistema Experto</b></h2>
             <br>
-            {{-- <p>User Registrations</p> --}}
         </div>
         <div class="icon">
             <i class="fa fa-desktop"></i>
         </div>
         <br>
-        {{-- href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i> --}}
         </div>
     </div>
 </a>

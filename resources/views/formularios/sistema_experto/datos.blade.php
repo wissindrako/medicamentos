@@ -1,15 +1,17 @@
 <div class="col-md-3">
     {{-- <a href="compose.html" class="btn btn-primary btn-block margin-bottom">Compose</a> --}}
-    <div class="box box-primary">
-      <div class="box-header with-border">
+    <div class="box box-solid">
+      <div class="box-header with-border bg-navy">
         <h3 class="box-title"><b>Datos Personales</b></h3>
       </div>
       <!-- /.box-header -->
       <div class="box-body">
-        <b><i class="fa fa-pencil margin-r-5"></i> Nombre:</b>
+        <b><i class="fa fa-pencil margin-r-5"></i> {{$persona[0]->usuario->roles[0]->description}}:</b>
 
         <p class="text-muted">
+
           {{$paciente->nombre}} {{$paciente->paterno}} {{$paciente->materno}}
+
         </p>
 
         {{-- <hr> --}}
@@ -28,7 +30,27 @@
       <!-- /.box-body -->
     </div>
     <div class="box box-solid">
-      <div class="box-header with-border">
+      <div class="box-header with-border bg-navy">
+        <h3 class="box-title"><b>Médico de Cabecera</b></h3>
+      </div>
+      <!-- /.box-header -->
+      <div class="box-body">
+        <b><i class="fa fa-user-md margin-r-5"></i> Médico:</b>
+
+        <p class="text-muted">
+          @if(isset($medico))
+          {{$medico->nombre}} {{$medico->paterno}} {{$medico->materno}}
+          @else
+          No asignado aún!
+          @endif
+        </p>
+
+      </div>
+      <!-- /.box-body -->
+    </div>
+
+    <div class="box box-solid">
+      <div class="box-header with-border bg-navy">
         <h3 class="box-title"><b>Historia Clínica</b></h3>
 
         <div class="box-tools">
