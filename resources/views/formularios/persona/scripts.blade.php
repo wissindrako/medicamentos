@@ -22,12 +22,12 @@
         document.getElementById("especialidad").required = false;
     }
 
-    if ($("#medico").val() != "") {
+
+
+    if ($("#rol_slug").val() == '4') { //paciente
         $("#div_medico").show();
-        document.getElementById("medico").required = true;
     } else {
         $("#div_medico").hide();
-        document.getElementById("medico").required = false;
     }
 
     $("#rol_slug").change(function(){
@@ -43,7 +43,7 @@
 
             document.getElementById("institucion").required = true;
             document.getElementById("especialidad").required = true;
-            document.getElementById("medico").required = false;
+
 
         }else if(rol_slug == '1'){ //Administrador
             $("#div_institucion").hide();
@@ -55,7 +55,6 @@
 
             document.getElementById("institucion").required = false;
             document.getElementById("especialidad").required = false;
-            document.getElementById("medico").required = false;
 
 
         }else{
@@ -67,7 +66,6 @@
 
             document.getElementById("institucion").required = false;
             document.getElementById("especialidad").required = false;
-            document.getElementById("medico").required = true;
 
         }
     });

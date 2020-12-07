@@ -48,6 +48,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('persona/{id}/recetas', 'HistorialController@form_recetas')->name('recetas_persona');
     Route::post('guardar_recetas', 'HistorialController@guardar_recetas');
 
+    Route::get('form_borrado_medico_cabecera/{id_paciente}', 'HistorialController@form_borrado_medico_cabecera');
+    Route::post('borrar_medico_cabecera', 'HistorialController@borrar_medico_cabecera');
+
     Route::get('persona/{id}/experto', 'ExpertoController@index')->name('experto');
 
     Route::get('persona/{id}/motorInferencia/{datos}', 'ExpertoController@motorInferencia')->name('motor_inferencia');

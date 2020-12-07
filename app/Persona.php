@@ -16,11 +16,4 @@ class Persona extends Model
         return $this->hasOne('App\User', 'id_persona', 'id_persona');
     }
 
-    /**
-     * Get the User record associated with the Person.
-     */
-    public function recinto()
-    {
-        return $this->belongsTo('App\Recinto', 'id_recinto', 'id_recinto');
-    }
 }

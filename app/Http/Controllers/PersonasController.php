@@ -93,7 +93,8 @@ class PersonasController extends Controller
         $persona->activo=1;
 
         if($persona->save()){
-            $username = $this->ObtieneUsuario($request->input("nombre"), $request->input("paterno"), $request->input("materno"));
+            $id = 0;
+            $username = $this->ObtieneUsuario($id, $request->input("nombre"), $request->input("paterno"), $request->input("materno"));
             $usuario=new User;
             $usuario->name=$username;
         
@@ -136,11 +137,17 @@ class PersonasController extends Controller
         ->where('id_persona', $id)
         ->first();
 
+        //  $personas = Persona::join('users', 'personas.id_persona', 'users.id_persona')
+        // // ->with('usuario.roles')
+        // // ->where('activo', 1)
+        // // ->where('id_persona', '!=', $id)
+        // ->get();
         $personas = Persona::with('usuario')
         ->with('usuario.roles')
         ->where('activo', 1)
         ->where('id_persona', '!=', $id)
         ->get();
+        // dd($personas);
 
         if (Auth::guest()) {
             $roles = \DB::table('roles')
@@ -149,11 +156,15 @@ class PersonasController extends Controller
         } else {
             $roles = \DB::table('roles')->get();
         }
+        $rol = $data->usuario->roles[0];
+
+        // dd($rol);
 
         return view("formularios.form_editar_persona")
         ->with('personas', $personas)
         ->with('roles', $roles)
-        ->with('data', $data);
+        ->with('data', $data)
+        ->with('rol', $rol);
     }
 
     public function editar_persona(ValidacionPersona $request, $id){
@@ -209,11 +220,13 @@ class PersonasController extends Controller
 
         if($persona->save()){
             $usuario= User::findOrFail($persona->usuario->id);
-            if($usuario->email != $request->input("cedula_identidad")){
-                $username = $this->ObtieneUsuario($request->input("nombre"), $request->input("paterno"), $request->input("materno"));
-                
+            if($usuario->name != $this->ObtieneUsuario($usuario->id, $request->input("nombre"), $request->input("paterno"), $request->input("materno"))){
+                $username = $this->ObtieneUsuario($usuario->id, $request->input("nombre"), $request->input("paterno"), $request->input("materno"));
                 $usuario->name=$username;
-            
+            }
+
+            if($usuario->email != $request->input("cedula_identidad")){
+
                 $usuario->email = $request->input("cedula_identidad");
                 $usuario->password= bcrypt($request->input("cedula_identidad"));
             }
@@ -306,7 +319,7 @@ class PersonasController extends Controller
     
 
 
-    public function ObtieneUsuario ($nombre, $paterno, $materno)
+    public function ObtieneUsuario ($id, $nombre, $paterno, $materno)
     {
         $nombre = ltrim($nombre);
         $paterno = ltrim($paterno);
@@ -323,7 +336,7 @@ class PersonasController extends Controller
         $numero = 0;
         $Nick = strtolower($primer_nombre[0].".".$apellido);
         
-        while (User::where('name', '=', $Nick)->exists()){ // nombre de usuario encontrado 
+        while (User::where('name', '=', $Nick)->where('id', '!=', $id)->exists()){ // nombre de usuario encontrado 
             $Nick=$Nick.$numero;
             $numero++;
         }

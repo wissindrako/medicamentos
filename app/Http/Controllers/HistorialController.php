@@ -199,4 +199,28 @@ class HistorialController extends Controller
         ->with('persona', $persona);
     }
 
+    public function form_borrado_medico_cabecera($id){
+ 
+        $paciente = Persona::where('id_persona', $id)->first();
+
+        return view("confirmaciones.form_borrado_medico_cabecera")
+        ->with('paciente', $paciente);
+    }
+
+    public function borrar_medico_cabecera(Request $request){
+        
+        $id_paciente=$request->input("id_persona");
+        $paciente=Persona::findOrFail($id_paciente);
+        $paciente->id_medico = 0;
+    
+        if($paciente->save()){
+             return view("mensajes.msj_medico_asignado_borrado")->with("msj","Medico de paciente actualizado Correctamente") ;
+        }
+        else
+        {
+            return view("mensajes.mensaje_error")->with("msj","..Hubo un error al agregar ; intentarlo nuevamente..");
+        }
+
+}
+
 }

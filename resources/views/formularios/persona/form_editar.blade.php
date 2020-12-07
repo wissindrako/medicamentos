@@ -39,16 +39,18 @@
         <label class="text-black">Rol</label>
         <div class="form-group bg-gray">
             @role('paciente')
-            <select  class="form-control" name="rol" id="rol_slug" disabled>
-                <input type="hidden" name="rol" value="{{ $data->usuario->roles[0]->id }}">
+            <select  class="form-control" name="rol" id="rol_slug" readonly>
+                <option value={{$rol->id}}>{{$rol->description}}</option>
+            </select>
             @endrole
             @role('medico')
-            <select  class="form-control" name="rol" id="rol_slug" disabled>
-                <input type="hidden" name="rol" value="{{ $data->usuario->roles[0]->id }}">
+            <select  class="form-control" name="rol" id="rol_slug" readonly>
+                <option value={{$rol->id}}>{{$rol->description}}</option>
+            </select>
+        </select>
             @endrole
             @role('super_admin')
             <select  class="form-control" name="rol" id="rol_slug">
-            @endrole
                 @if(!isset($data) && !old('rol'))
                     <option value="" selected> --- SELECCIONE UN ROL --- </option>
                     @foreach ($roles as $rol)
@@ -69,6 +71,8 @@
                 @endif
                 
             </select>
+            @endrole
+
         </div>
     </div>
 </div>

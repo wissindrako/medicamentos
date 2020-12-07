@@ -40,9 +40,4 @@ class User extends Authenticatable
         return $this->belongsTo('App\Persona', 'id_persona', 'id_persona');
     }
 
-    public function mesas()
-    {
-        //return $this->belongsTo('App\Persona', 'foreign_key', 'local_key');
-        return $this->belongsToMany('App\Mesa', 'rel_usuario_mesa', 'id_usuario', 'id_mesa');
-    }
 }

@@ -32,7 +32,7 @@
     <link href="{{ asset('/plugins/datatables/jquery.dataTables.min.css') }}" rel="stylesheet" type="text/css" />
 
 
-    <link href="{{ asset('/css/ajllita.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('/css/sistema.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/alertify.css') }}" rel="stylesheet" type="text/css" />
 
     <!-- Favicon and touch icons -->
