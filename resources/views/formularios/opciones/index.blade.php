@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('htmlheader_title')
-	Home
+	Oociones Paciente
 @endsection
 
 
@@ -33,7 +33,6 @@
                  <div class="myform-top">
                     <div class="myform-top-left">
                       <h3>Opciones</h3>
-                        <p>Por favor pulse sobre la cada uno de los botones para llenar las diferentes opciones</p>
                     </div>
                     <div class="myform-top-right">
                         @role('super_admin')
@@ -71,8 +70,9 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="myform-bottom">
-                            <hr>
+                            
                             @if($persona[0]->usuario->roles[0]->slug == 'super_admin' || $persona[0]->usuario->roles[0]->slug == 'medico')
+                            <hr>
                             <div class="row">
                                     <i class="fa fa-book margin-r-5"></i><b>{{$persona[0]->usuario->roles[0]->description}}: </b>
                                     {{$persona[0]->nombre}} {{$persona[0]->paterno}} {{$persona[0]->materno}}
@@ -87,10 +87,6 @@
                                     @include('formularios.opciones.historial')
                                 @endif
 
-
-
-
-                            
                             &nbsp;&nbsp;&nbsp;
                             
 

@@ -17,6 +17,11 @@ class ExpertoController extends Controller
         // Datos Personales 
         // Historia Clínica
         // Experto
+                
+        $persona = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_persona', $id)
+        ->get();
        
         $paciente = Persona::findOrFail($id);
         $medico = Persona::findOrFail($paciente->id_medico);
@@ -38,10 +43,10 @@ class ExpertoController extends Controller
             if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
             if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
         }
-        // return view('admin.user.editar', compact('data', 'roles'));
+
         return view('formularios.sistema_experto.index', 
         compact(
-            'paciente', 'medico', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
+            'persona', 'paciente', 'medico', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
         ));
     }
     
@@ -89,7 +94,7 @@ class ExpertoController extends Controller
         $grado_medio = 1;
         $grado_bajo = 0;
 
-      //Premisas Antecedentes
+        //Premisas Antecedentes
         $p_antecedentes_1 = 'El registro de antecedentes permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
         $p_antecedentes_2 = 'Si alguno de los antecedentes interactua con los medicamentos, podrían ocasionar efectos secundarios, contraindicaciones e interacciones';
 
@@ -223,7 +228,7 @@ class ExpertoController extends Controller
                     
                     $e = array();
                     $e['premisa'] = $p_alergias_2;
-                    $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "Interacciones"';
+                    $e['resultado'] = 'El medicamento: '.$meta->nombre.' presenta "Interacciones"';
                     $e['conclusion'] = 'Las alergias causadas por "'.$value.'" podría ser de gravedad.';
                     $e['grado'] = $e['grado'] = $grado_alto;
                     array_push($resultados, $e);
@@ -239,7 +244,7 @@ class ExpertoController extends Controller
                     
                     $e = array();
                     $e['premisa'] = $p_recetas_2;
-                    $e['resultado'] = 'El medicamento: '.$data->nombre.' presenta "Interacciones"';
+                    $e['resultado'] = 'El medicamento: '.$meta->nombre.' presenta "Interacciones"';
                     $e['conclusion'] = 'Las interaciones por "'.$value.'" podrían causar sobredosis.';
                     $e['grado'] = $e['grado'] = $grado_alto;
                     array_push($resultados, $e);

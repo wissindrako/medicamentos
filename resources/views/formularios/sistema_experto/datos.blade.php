@@ -3,6 +3,10 @@
     <div class="box box-solid">
       <div class="box-header with-border bg-navy">
         <h3 class="box-title"><b>Datos Personales</b></h3>
+        <div class="box-tools">
+          <button type="button" class="btn btn-box-tool" id="minimizar" data-widget="collapse"><i class="fa fa-plus"></i>
+          </button>
+        </div>
       </div>
       <!-- /.box-header -->
       <div class="box-body">
@@ -14,13 +18,13 @@
 
         </p>
 
-        {{-- <hr> --}}
+        <b><i class="fa fa-pencil margin-r-5"></i> Celular:</b>
+
+        <p class="text-muted">{{$paciente->telefono_celular}}</p>
 
         <b><i class="fa fa-pencil margin-r-5"></i> Edad:</b>
 
         <p class="text-muted">{{$paciente->edad}}</p>
-
-        {{-- <hr> --}}
 
         <b><i class="fa fa-pencil margin-r-5"></i> Sexo:</b>
 
@@ -29,9 +33,13 @@
       </div>
       <!-- /.box-body -->
     </div>
-    <div class="box box-solid">
+    <div class="box box-solid collapsed-box">
       <div class="box-header with-border bg-navy">
         <h3 class="box-title"><b>Médico de Cabecera</b></h3>
+        <div class="box-tools">
+          <button type="button" class="btn btn-box-tool" id="minimizar" data-widget="collapse"><i class="fa fa-plus"></i>
+          </button>
+        </div>
       </div>
       <!-- /.box-header -->
       <div class="box-body">
@@ -49,12 +57,11 @@
       <!-- /.box-body -->
     </div>
 
-    <div class="box box-solid">
+    <div class="box box-solid collapsed-box">
       <div class="box-header with-border bg-navy">
         <h3 class="box-title"><b>Historia Clínica</b></h3>
-
         <div class="box-tools">
-          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          <button type="button" class="btn btn-box-tool" id="minimizar" data-widget="collapse"><i class="fa fa-plus"></i>
           </button>
         </div>
       </div>

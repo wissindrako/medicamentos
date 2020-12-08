@@ -1,6 +1,10 @@
 <script>
     // $( "#dato" ).keyup(function() {
         // activar_eventos();
+    $('.collapse').collapse('hide');
+    $('#myCollapsible').collapse({
+    toggle: true
+    })
     $("#div_diagnostico").hide();
     function consultar() {
 

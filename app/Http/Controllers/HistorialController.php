@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class HistorialController extends Controller
 {
     public function form_antecedentes($id){
-
+        // Mostrar el formulario para llenar antecedentes
         
         $historia = Historial::where('id_persona', $id)->first();
 
@@ -32,6 +32,7 @@ class HistorialController extends Controller
     }
 
     public function guardar_antecedentes(Request $request){
+        // Guardando los datos del formulario antecedentes
         $historia = Historial::find($request->id_historial);
 
         $persona = Persona::with('usuario')
@@ -42,13 +43,33 @@ class HistorialController extends Controller
         $historia->antecedentes = json_encode($request->except(['_token', 'id_historial']));
         $historia->save();
 
+        $paciente = Persona::findOrFail($historia->id_persona);
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $historia->id_persona)
+        ->get();
+        if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+        if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+        if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+        if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+
         return view("formularios.opciones.index")
-        ->with('persona', $persona);
+        ->with('persona', $persona)
+        ->with('paciente', $paciente)
+        ->with('familiares', $familiares)
+        ->with('antecedentes', $antecedentes)
+        ->with('enfermedades', $enfermedades)
+        ->with('alergias', $alergias)
+        ->with('recetas', $recetas);
 
     }
 
     public function form_enfermedades($id){
-
+        // Mostrar el formulario para llenar enfermedades
         
         $historia = Historial::where('id_persona', $id)->first();
 
@@ -66,6 +87,7 @@ class HistorialController extends Controller
     }
 
     public function guardar_enfermedades(Request $request){
+        // Guardando los datos del formulario enfermedades
         $historia = Historial::find($request->id_historial);
 
         $persona = Persona::with('usuario')
@@ -76,13 +98,33 @@ class HistorialController extends Controller
         $historia->enfermedades = json_encode($request->except(['_token', 'id_historial']));
         $historia->save();
 
+        $paciente = Persona::findOrFail($historia->id_persona);
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $historia->id_persona)
+        ->get();
+        if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+        if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+        if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+        if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+
         return view("formularios.opciones.index")
-        ->with('persona', $persona);
+        ->with('persona', $persona)
+        ->with('paciente', $paciente)
+        ->with('familiares', $familiares)
+        ->with('antecedentes', $antecedentes)
+        ->with('enfermedades', $enfermedades)
+        ->with('alergias', $alergias)
+        ->with('recetas', $recetas);
 
     }
 
     public function form_alergias($id){
- 
+        // Mostrar el formulario para llenar alergias
         
         $historia = Historial::where('id_persona', $id)->first();
 
@@ -103,6 +145,7 @@ class HistorialController extends Controller
     }
 
     public function guardar_alergias(Request $request){
+        // Guardando los datos del formulario alergias
         $historia = Historial::find($request->id_historial);
 
         $persona = Persona::with('usuario')
@@ -118,12 +161,33 @@ class HistorialController extends Controller
             $historia->save();
         }
 
+        $paciente = Persona::findOrFail($historia->id_persona);
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $historia->id_persona)
+        ->get();
+        if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+        if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+        if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+        if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+
         return view("formularios.opciones.index")
-        ->with('persona', $persona);
+        ->with('persona', $persona)
+        ->with('paciente', $paciente)
+        ->with('familiares', $familiares)
+        ->with('antecedentes', $antecedentes)
+        ->with('enfermedades', $enfermedades)
+        ->with('alergias', $alergias)
+        ->with('recetas', $recetas);
+
     }
 
     public function form_familiares($id){
- 
+        // Mostrar el formulario para llenar familiares
         
         $personas = Persona::with('usuario')
         ->with('usuario.roles')
@@ -138,7 +202,7 @@ class HistorialController extends Controller
     }
 
     public function guardar_familiares(ValidacionFamiliar $request){
-
+        // Guardando los datos del formulario familiares
         $tiempo_actual = new DateTime(date('Y-m-d H:i:s'));
 
         $familiar=new Persona;
@@ -153,17 +217,40 @@ class HistorialController extends Controller
 
         $familiar->save();
 
+        $historia = Historial::where('id_persona', $request->id_paciente)->first();
+
         $persona = Persona::with('usuario')
         ->with('usuario.roles')
         ->where('id_persona', $request->id_paciente)
         ->get();
 
+        $paciente = Persona::findOrFail($historia->id_persona);
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $historia->id_persona)
+        ->get();
+        if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+        if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+        if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+        if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+
         return view("formularios.opciones.index")
-        ->with('persona', $persona);
+        ->with('persona', $persona)
+        ->with('paciente', $paciente)
+        ->with('familiares', $familiares)
+        ->with('antecedentes', $antecedentes)
+        ->with('enfermedades', $enfermedades)
+        ->with('alergias', $alergias)
+        ->with('recetas', $recetas);
+
     }
 
     public function form_recetas($id){
- 
+        // Mostrar el formulario para llenar los medicamentos que consume el paciente
         $historia = Historial::where('id_persona', $id)->first();
 
         $recetas  = json_decode($historia->recetas);
@@ -183,6 +270,7 @@ class HistorialController extends Controller
     }
 
     public function guardar_recetas(Request $request){
+        // Guardando los datos del formulario recetas
         $historia = Historial::find($request->id_historial);
 
         $persona = Persona::with('usuario')
@@ -195,12 +283,33 @@ class HistorialController extends Controller
             $historia->save();
         }
 
+        $paciente = Persona::findOrFail($historia->id_persona);
+        $antecedentes = [];
+        $enfermedades = [];
+        $alergias = [];
+        $recetas = [];
+        $familiares = Persona::with('usuario')
+        ->with('usuario.roles')
+        ->where('id_parent', $historia->id_persona)
+        ->get();
+        if ($historia->antecedentes) {$antecedentes = json_decode($historia->antecedentes);}
+        if ($historia->enfermedades) {$enfermedades = json_decode($historia->enfermedades);}
+        if ($historia->alergias) {$alergias = json_decode($historia->alergias);}
+        if ($historia->recetas) {$recetas = json_decode($historia->recetas);}
+
         return view("formularios.opciones.index")
-        ->with('persona', $persona);
+        ->with('persona', $persona)
+        ->with('paciente', $paciente)
+        ->with('familiares', $familiares)
+        ->with('antecedentes', $antecedentes)
+        ->with('enfermedades', $enfermedades)
+        ->with('alergias', $alergias)
+        ->with('recetas', $recetas);
+
     }
 
     public function form_borrado_medico_cabecera($id){
- 
+        // Mostrar el formulario para quitar el medico asignado a un paciente determinado
         $paciente = Persona::where('id_persona', $id)->first();
 
         return view("confirmaciones.form_borrado_medico_cabecera")
@@ -208,7 +317,7 @@ class HistorialController extends Controller
     }
 
     public function borrar_medico_cabecera(Request $request){
-        
+        // Quitar el medico asignado a un determinado paciente
         $id_paciente=$request->input("id_persona");
         $paciente=Persona::findOrFail($id_paciente);
         $paciente->id_medico = 0;
@@ -221,6 +330,6 @@ class HistorialController extends Controller
             return view("mensajes.mensaje_error")->with("msj","..Hubo un error al agregar ; intentarlo nuevamente..");
         }
 
-}
+    }
 
 }

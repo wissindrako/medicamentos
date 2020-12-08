@@ -34,7 +34,7 @@
                             <!-- /.form-group -->
                             <div class="form-group">
                               <br>
-                              <button onclick="consultar()" class="btn btn-info pull-right btn-block btn-lg">Consultar</button>
+                              <button onclick="consultar()" class="btn btn-primary pull-right btn-block btn-lg">Consultar</button>
                             </div>
                             <!-- /.form-group -->
                           </div>

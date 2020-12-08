@@ -43,13 +43,17 @@
 				@foreach ($personas as $item)
 				
 					<tr class='clickable-roww' data-href="{{route('opciones_persona', ['id' => $item->id_persona])}}">
-						<td>{{ $item->nombre}} 
-
-							@if($item->paterno)
-							{{$item->paterno }}
-							@else
-							{{$item->materno ?? ''}}
-							@endif
+						<td>{{$item->nombre}} 
+							@role('medico')
+								@if($item->paterno)
+								{{$item->paterno }}
+								@else
+								{{$item->materno ?? ''}}
+								@endif
+							@endrole
+							@role('super_admin')
+							{{$item->paterno}} {{$item->materno}}
+							@endrole
 						</td>	
 						@role('super_admin')
 						<td>{{ $item->cedula_identidad}}</td>

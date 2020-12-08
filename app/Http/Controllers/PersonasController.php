@@ -126,9 +126,6 @@ class PersonasController extends Controller
 
     public function form_editar_persona($id){
         //carga el formulario para agregar un nueva persona
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
 
         $roles = [];
 
@@ -137,11 +134,6 @@ class PersonasController extends Controller
         ->where('id_persona', $id)
         ->first();
 
-        //  $personas = Persona::join('users', 'personas.id_persona', 'users.id_persona')
-        // // ->with('usuario.roles')
-        // // ->where('activo', 1)
-        // // ->where('id_persona', '!=', $id)
-        // ->get();
         $personas = Persona::with('usuario')
         ->with('usuario.roles')
         ->where('activo', 1)
@@ -168,9 +160,6 @@ class PersonasController extends Controller
     }
 
     public function editar_persona(ValidacionPersona $request, $id){
-        // if(\Auth::user()->isRole('registrador')==false && \Auth::user()->isRole('admin')==false && \Auth::user()->isRole('responsable_circunscripcion')==false){
-        //     return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;
-        // }
         
         $foto = "";
 
@@ -287,7 +276,6 @@ class PersonasController extends Controller
         }
     }
 
-
     public function listado_personas(){
 
         $personas = [];
@@ -316,8 +304,6 @@ class PersonasController extends Controller
         return view("listados.listado_personas")
         ->with('personas', $personas);
     }
-    
-
 
     public function ObtieneUsuario ($id, $nombre, $paterno, $materno)
     {
@@ -334,7 +320,7 @@ class PersonasController extends Controller
         }
     
         $numero = 0;
-        $Nick = strtolower($primer_nombre[0].".".$apellido);
+        $Nick = strtolower($primer_nombre[0]." ".$apellido);
         
         while (User::where('name', '=', $Nick)->where('id', '!=', $id)->exists()){ // nombre de usuario encontrado 
             $Nick=$Nick.$numero;
