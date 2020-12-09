@@ -52,6 +52,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('borrar_medico_cabecera', 'HistorialController@borrar_medico_cabecera');
 
     Route::get('persona/{id}/experto', 'ExpertoController@index')->name('experto');
+    Route::get('arbol', 'ExpertoController@arbol')->name('arbol');
 
     Route::get('persona/{id}/motorInferencia/{datos}', 'ExpertoController@motorInferencia')->name('motor_inferencia');
 

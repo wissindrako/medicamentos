@@ -24,6 +24,7 @@ class ExpertoController extends Controller
         ->get();
        
         $paciente = Persona::findOrFail($id);
+
         $medico = Persona::findOrFail($paciente->id_medico);
         $historia = Historial::where('id_persona', $paciente->id_persona)->first();
         $antecedentes = [];
@@ -59,6 +60,10 @@ class ExpertoController extends Controller
         ->get();
 
         $paciente = Persona::findOrFail($id);
+
+        $pacientes = Persona::where('id_medico', $id)
+        ->get();
+
         $medico = Persona::find($paciente->id_medico);
         $historia = Historial::where('id_persona', $paciente->id_persona)->first();
         $antecedentes = [];
@@ -81,7 +86,7 @@ class ExpertoController extends Controller
 
         return view("formularios.opciones.index", 
         compact(
-            'persona', 'paciente', 'medico', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
+            'persona', 'paciente', 'pacientes', 'medico', 'antecedentes', 'enfermedades', 'alergias', 'recetas', 'familiares', 'medicamentos'
         ));
     }
 
@@ -99,7 +104,7 @@ class ExpertoController extends Controller
         $p_antecedentes_2 = 'Si alguno de los antecedentes interactua con los medicamentos, podrían ocasionar efectos secundarios, contraindicaciones e interacciones';
 
         $p_enfermedades_1 = 'El registro de falencias permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
-        $p_enfermedades_2 = 'Si alguna de las enfermedades interactua con los medicamentos, podrían ocasionar efectos secundarios, contraindicaciones e interacciones';
+        $p_enfermedades_2 = 'Si alguna de las falencias interactua con los medicamentos, podrían ocasionar efectos secundarios, contraindicaciones e interacciones';
 
         $p_alergias_1 = 'El registro de alergias permite buscar, efectos secundarios, contraindicaciones y otras interacciones con los medicamentos';
         $p_alergias_2 = 'Si alguna de las alergias interactua con el nuevo medicamento, podría ocasionar efectos secundarios, contraindicaciones e interacciones';
@@ -143,7 +148,7 @@ class ExpertoController extends Controller
             else{
                 $e = array();
                 $e['premisa'] = $p_enfermedades_1;
-                $e['resultado'] = 'No hay registro de enfermedades';;
+                $e['resultado'] = 'No hay registro de falencias';;
                 $e['conclusion'] = 'Se recomienda actualizar Hisoria Clínica, para obtener mejores resultados.';
                 $e['grado'] = $grado_bajo;
                 array_push($resultados, $e);
@@ -169,9 +174,6 @@ class ExpertoController extends Controller
         $arr_enfermedades = $enfermedades;
         $arr_alergias = $alergias;
         $arr_recetas = $recetas;
-
-        // $medicamentos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
-        // $efectos = Medicamento::orderBy('efectos', 'asc')->distinct()->pluck('efectos');
 
         // Obteniendo el medicamento consultado
         $medicamentos = Medicamento::where('nombre', $datos);
@@ -315,6 +317,10 @@ class ExpertoController extends Controller
         }
 
         return json_encode($resultados);
+    }
+
+    public function arbol(){
+        return view('formularios.sistema_experto.arbol');
     }
 
     //Verificando si el medicamento tuviese un Grado Alto o Bajo de riesgo

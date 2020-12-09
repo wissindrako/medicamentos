@@ -71,7 +71,7 @@
           <p class="text-muted">
             
             @forelse ($antecedentes as $item => $value)
-                {{$item}}{{$value ? ' : '.$value.', ' : ', '}} 
+              {{$item}}{{$value ? ' : '.$value.', ' : ', '}} 
             @empty
                 No hay antecedentes registrados
             @endforelse
@@ -82,8 +82,9 @@
 
           <b><i class="fa fa-circle-o margin-r-5"></i> Falencias</b>
           <p class="text-muted">
+
             @forelse ($enfermedades as $item => $value)
-                {{$item}}{{$value ? ' : '.$value.', ' : ', '}}
+              {{$item}}{{$value ? ' : '.$value.', ' : ', '}}
             @empty
                 <p>No hay enfermedades registradas</p>
             @endforelse
@@ -92,8 +93,12 @@
 
           <b><i class="fa fa-circle-o margin-r-5"></i> Alergias</b>
           <p class="text-muted">
-            @forelse ($alergias as $item)
-                {{$item}}, 
+            @forelse ($alergias as $item)               
+              @if($loop->last)
+              {{$item}}
+              @else
+              {{$item}}, 
+              @endif
             @empty
                 <p>No hay alergias registradas</p>
             @endforelse
@@ -102,7 +107,11 @@
           <b><i class="fa fa-circle-o margin-r-5"></i> Consumo de medicamentos</b>
           <p class="text-muted">
             @forelse ($recetas as $item)
-                {{$item}}, 
+              @if($loop->last)
+              {{$item}}
+              @else
+              {{$item}}, 
+              @endif
             @empty
                 <p>No consume ningún medicamento</p>
             @endforelse
@@ -124,5 +133,13 @@
         </div>
       <!-- /.box-body -->
     </div>
-
+    @role('super_admin')
+    {{-- Arbol --}}
+    <div class="box box-solid">
+      <div class="box-body">
+        <a href="{{ url('arbol') }}" class="btn btn-primary btn-block"><b>Arbol SE</b></a>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    @endrole
   </div>
