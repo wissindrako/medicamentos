@@ -54,6 +54,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('persona/{id}/experto', 'ExpertoController@index')->name('experto');
     Route::get('arbol', 'ExpertoController@arbol')->name('arbol');
 
+    Route::get('medicamentos', 'MedicamentoController@index')->name('medicamentos');
+    Route::get('form_agregar_medicamento', 'MedicamentoController@form_agregar_medicamento')->name('form_agregar_medicamento');
+    Route::post('guardar_medicamento', 'MedicamentoController@guardar_medicamento');
+
     Route::get('persona/{id}/motorInferencia/{datos}', 'ExpertoController@motorInferencia')->name('motor_inferencia');
 
     Route::get('/home', 'HomeController@index');
@@ -61,6 +65,10 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('form_editar_persona/{id}', 'PersonasController@form_editar_persona')->name('form_editar_persona');
     Route::post('editar_persona/{id}', 'PersonasController@editar_persona')->name('editar_persona');
+
+    Route::get('form_eliminar_paciente_medico/{id}', 'PersonasController@form_eliminar_paciente_medico');
+    Route::post('eliminar_paciente_medico', 'PersonasController@eliminar_paciente_medico');
+
 
     Route::post('editar_asignacion_persona', 'PersonasController@editar_asignacion_persona');
     Route::post('editar_evidencia_persona', 'PersonasController@editar_evidencia_persona');
@@ -71,9 +79,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('buscar_persona', 'PersonasController@buscar_persona');
 
     Route::post('baja_persona', 'PersonasController@baja_persona');
-
-    Route::get('listado_personas_asignacion', 'PersonasController@listado_personas_asignacion');
-    Route::resource('buscar_persona_asignacion', 'PersonasController@buscar_persona_asignacion');
 
 
     Route::get('/listado_usuarios', 'UsuariosController@listado_usuarios');

@@ -433,6 +433,7 @@ function borrado_usuario(idusu){
     $("#capa_formularios").html(resul);
    }) ;
 }
+
 function borrado_paciente(id_paciente){
 
    var urlraiz=$("#url_raiz_proyecto").val();
@@ -442,6 +443,28 @@ function borrado_paciente(id_paciente){
    $("#capa_formularios").css('top', screenTop);
    $("#capa_formularios").html($("#cargador_empresa").html());
    var miurl=urlraiz+"/form_borrado_medico_cabecera/"+id_paciente+"";
+
+    $.ajax({
+    url: miurl
+    }).done( function(resul)
+    {
+     $("#capa_formularios").html(resul);
+
+    }).fail( function(resul)
+   {
+    $("#capa_formularios").html(resul);
+   }) ;
+}
+
+function eliminar_paciente_medico(id){
+
+   var urlraiz=$("#url_raiz_proyecto").val();
+   $("#capa_modal").show();
+   $("#capa_formularios").show();
+   var screenTop = $(document).scrollTop();
+   $("#capa_formularios").css('top', screenTop);
+   $("#capa_formularios").html($("#cargador_empresa").html());
+   var miurl=urlraiz+"/form_eliminar_paciente_medico/"+id+"";
 
     $.ajax({
     url: miurl

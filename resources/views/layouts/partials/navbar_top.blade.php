@@ -2,6 +2,11 @@
     <ul class="nav navbar-nav">
       {{-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li> --}}
       @role('super_admin')
+      <li>
+        <a href="{{ route('medicamentos') }}">
+          <img src="{{ url('img/pill-icon.png') }}" class="img-circle" style="width: 25px; height: 25px;" alt=" "/>
+        </a>
+      </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuracion <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -9,16 +14,14 @@
             @if (Auth::user()->persona)
             <li><a href="{{route('form_editar_persona', ['id' => Auth::user()->persona->id_persona])}}"><i class="fa fa-user"></i> Mi perfil</a></li>
             @endif
-            
-              {{-- <li><a href="{{ url('listado_empresas') }}">Usuarios</a></li> --}}
           </ul>
       </li>
       @endrole
       @role('medico')
       <li><a href="{{route('form_editar_persona', ['id' => Auth::user()->persona->id_persona])}}"><i class="fa fa-user"></i> Mi perfil</a></li>
       @endrole
-      {{-- <li><a href="{{ url('mapa') }}"><i class="fa fa-map-marker"></i> Mapa</a></li>
-      <li><a href="{{ url('quienes_somos') }}"><i class="fa fa-info-circle"></i> Quienes Somos</a></li>
+      
+      {{-- <li><a href="{{ url('quienes_somos') }}"><i class="fa fa-info-circle"></i> Quienes Somos</a></li>
       <li><a href="{{ url('contactos') }}"><i class="fa fa-phone-square"></i> Contactos</a></li>
       <li><a href="#"><i class="fa fa-question-circle "></i> F.A.Q.</a></li> --}}
       {{-- <li class="dropdown">

@@ -249,6 +249,45 @@ class PersonasController extends Controller
         }
     }
 
+    public function form_eliminar_paciente_medico($id){
+        // Mostrar el formulario para quitar el medico o paciente determinado
+
+        $persona = Persona::where('id_persona', $id)->first();
+
+        return view("confirmaciones.form_eliminar_paciente_medico")
+        ->with('persona', $persona);
+    }
+
+    public function eliminar_paciente_medico(Request $request){
+        $id_persona=$request->input("id_persona");
+        $usuario = User::where('id_persona', $id_persona)->first();
+        $persona = Persona::where('id_persona', $id_persona)->first();
+        $historial = Historial::where('id_persona', $id_persona)->first();
+
+        $parientes = Persona::where('id_parent', $id_persona)->get();
+
+        foreach ($parientes as $key => $value) {
+            $pariente = Persona::where('id_persona', $value->id_persona)->first();
+            $pariente->delete();
+        }
+
+        $historial->delete();
+
+        if($persona->delete()){
+            $usuario->revokeAllRoles();
+            if($usuario->delete()){
+                return view("mensajes.msj_usuario_borrado")->with("msj","Usuario borrado correctamente") ;
+            }else{
+                return view("mensajes.mensaje_error")->with("msj","..Hubo un error al agregar ; intentarlo nuevamente..");
+            }
+        }
+        else
+        {
+            return view("mensajes.mensaje_error")->with("msj","..Hubo un error al agregar ; intentarlo nuevamente..");
+        }
+
+    }
+
     public function form_baja_persona($id_persona){
         if(\Auth::user()->isRole('admin')==false){
             return view("mensajes.mensaje_error")->with("msj",'<div class="box box-danger col-xs-12"><div class="rechazado" style="margin-top:70px; text-align: center">    <span class="label label-success">#!<i class="fa fa-check"></i></span><br/>  <label style="color:#177F6B">  Acceso restringido </label>   </div></div> ') ;

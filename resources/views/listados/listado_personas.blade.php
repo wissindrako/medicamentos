@@ -76,7 +76,7 @@
 							</a>
 							@if($item->usuario->roles[0]->slug == 'paciente')
 							@role('super_admin')
-							<button type="button"  class="btn btn-danger btn-sm"  onclick="borrado_paciente({{  $item->id_persona }});"  ><i class="fa fa-fw fa-remove"></i></button>
+							<button type="button"  class="btn btn-danger btn-sm"  onclick="eliminar_paciente_medico({{  $item->id_persona }});"  ><i class="fa fa-fw fa-remove"></i></button>
 							@endrole
 							@role('medico')
 							<button type="button"  class="btn btn-danger btn-sm"  onclick="borrado_paciente({{  $item->id_persona }});"  ><i class="fa fa-fw fa-remove"></i></button>
@@ -84,8 +84,16 @@
 							@role('paciente')
 							<button type="button" class="btn btn-danger btn-sm" disabled><i class="fa fa-fw fa-remove"></i></button>
 							@endrole
-							@else
-							<button type="button" class="btn btn-danger btn-sm" disabled><i class="fa fa-fw fa-remove"></i></button>
+							@endif
+							@if($item->usuario->roles[0]->slug == 'medico')
+							@role('super_admin')
+							<button type="button"  class="btn btn-danger btn-sm"  onclick="eliminar_paciente_medico({{  $item->id_persona }});"  ><i class="fa fa-fw fa-remove"></i></button>
+							@endrole
+							@endif
+							@if($item->usuario->roles[0]->slug == 'super_admin')
+							@role('super_admin')
+							<button type="button"  class="btn btn-danger btn-sm" disabled><i class="fa fa-fw fa-remove"></i></button>
+							@endrole
 							@endif
 							
 						</td>
