@@ -10,6 +10,7 @@
 | to using a Closure or controller method. Build something great!
 |
 */
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -60,7 +61,18 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('persona/{id}/motorInferencia/{datos}', 'ExpertoController@motorInferencia')->name('motor_inferencia');
 
-    Route::get('/home', 'HomeController@index');
+    // Route::get('/home', 'HomeController@index');
+    Route::get('/home', [function(){
+        if(\Auth::user()->isRole('super_admin')==true){
+            return redirect()->intended('listado_personas');
+        }
+        if(\Auth::user()->isRole('medico')==true){
+            return redirect()->intended('listado_personas');
+        }
+        if(\Auth::user()->isRole('paciente')==true){
+            return redirect()->intended('persona/'.Auth::user()->id_persona.'/opciones');
+        }
+      }]);
 
 
     Route::get('form_editar_persona/{id}', 'PersonasController@form_editar_persona')->name('form_editar_persona');
