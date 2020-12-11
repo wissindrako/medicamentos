@@ -218,28 +218,12 @@ $(document).on("submit",".formentrada",function(e){
   var formu=$(this);
   var varurl="";
 
-  if(quien=="f_asignar_mesas_recinto"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_asignar_usuario_mesa"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
+ 
   if(quien=="f_enviar_agregar_persona"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
   if(quien=="f_enviar_editar_persona"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
   if(quien=="f_baja_persona"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
 
-  if(quien=="f_enviar_gastronomia"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_enviar_visitante"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_enviar_literatura"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_enviar_turismo"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_enviar_productores"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_enviar_artesania"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
 
-
-  if(quien=="f_editar_solicitud"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_editar_gestion"){  var varurl=$(this).attr("action");  var div_resul="capa_formularios";}
-  if(quien=="f_crear_gestion"){  var varurl=$(this).attr("action");  var div_resul="capa_formularios";}
-  if(quien=="f_editar_tiempo"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";}
-  if(quien=="f_agregar_fechas"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_modal";  }
-  if(quien=="f_autorizar_solicitud"){  var varurl=$(this).attr("action");  var div_resul="capa_formularios";  }
-  if(quien=="f_aprobar_solicitud"){  var varurl=$(this).attr("action");  var div_resul="capa_formularios";  }
-  if(quien=="f_crear_solicitud"){  var varurl=$(this).attr("action");  var div_resul="div_notificacion_sol";  }
   if(quien=="f_crear_usuario"){  var varurl=$(this).attr("action");  var div_resul="capa_formularios";  }
   if(quien=="f_crear_permiso"){  var varurl=$(this).attr("action");  var div_resul="capa_formularios";  }
   if(quien=="f_editar_usuario"){  var varurl=$(this).attr("action");  var div_resul="notificacion_E2";  }

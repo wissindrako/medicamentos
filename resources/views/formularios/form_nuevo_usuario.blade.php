@@ -8,7 +8,7 @@
                 
                      <div class="myform-top">
                         <div class="myform-top-left">
-                           <img  src="{{ url('img/minculturas_logo.png') }}" class="img-responsive logo" />
+                           <img  src="{{ url('img/avatar.png') }}" class="img-responsive logo" />
                           <h3 class="text-muted">Registro de Usuarios.</h3>
                             <p class="text-muted">Por favor ingrese sus datos personales:</p>
                         </div>
@@ -153,12 +153,6 @@
                     </div>
               </div>
             </div>
-            {{-- <div class="row">
-                <div class="col-sm-12 mysocial-login">
-                    <h3>...Visitanos en nuestra Pagina</h3>
-                    <h1><strong>minculturas.gob.bo</strong>.net</h1>
-                </div>
-            </div> --}}
         </div>
       </div>
  

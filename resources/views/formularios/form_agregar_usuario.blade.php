@@ -8,7 +8,7 @@
                 
                      <div class="myform-top">
                         <div class="myform-top-left">
-                           <img  src="{{ url('img/minculturas_logo.png') }}" class="img-responsive logo" />
+                           <img  src="{{ url('img/avatar.png') }}" class="img-responsive logo" />
                           <h3 class="text-muted">Registro de Usuarios.</h3>
                             <p class="text-muted">Por favor ingrese sus datos personales:</p>
                         </div>
@@ -87,19 +87,7 @@
                                 <input type="date" name="fechaingreso" placeholder="Fecha de Ingreso" class="form-control" value="{{ old('fechaingreso') }}" />
                             </div>
                         </div>
-                        {{-- <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="text-muted ">Item</label>
-                                <input type="number" name="item" placeholder="Item" class="form-control"  
-                                    value="{{ old('item') }}" />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="text-muted ">Salario</label>
-                                <input type="number" name="haber" placeholder="Salario" class="form-control" value="{{ old('haber') }}" />
-                            </div>
-                        </div> --}}
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="text-muted ">Cargo</label>
@@ -113,11 +101,6 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="text-muted ">Area</label>
-                                {{-- <select class="form-control" name="area">
-                                    @foreach ($unidades as $unidad)
-                                <option value="{{$unidad->id}}" {{ old('area', $unidad->id) == $unidad->id ? 'selected' : '' }}>{{$unidad->nombre}}</option>
-                                    @endforeach
-                                </select> --}}
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -142,10 +125,6 @@
                                     <input type="password" name="password_confirmation" placeholder="Repite Password" class="form-control" >
                             </div>
                         </div>
-{{-- 
-                        <div class="form-group">
-                         {!! Recaptcha::render() !!}
-                        </div> --}}
 
                         <button type="submit" class="mybtn">Registrar</button>
                       </form>
@@ -153,12 +132,6 @@
                     </div>
               </div>
             </div>
-            {{-- <div class="row">
-                <div class="col-sm-12 mysocial-login">
-                    <h3>...Visitanos en nuestra Pagina</h3>
-                    <h1><strong>minculturas.gob.bo</strong>.net</h1>
-                </div>
-            </div> --}}
         </div>
       </div>
  

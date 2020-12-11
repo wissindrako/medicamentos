@@ -8,7 +8,7 @@
                     
                          <div class="myform-top">
                             <div class="myform-top-left">
-                               {{-- <img  src="{{ url('img/minculturas_logo.png') }}" class="img-responsive logo" /> --}}
+                               {{-- <img  src="{{ url('img/avatar.png') }}" class="img-responsive logo" /> --}}
                               <h3 class="text-black">Baja de Usuario</h3>
                                 <p class="text-black">Datos de la Persona</p>
                             </div>

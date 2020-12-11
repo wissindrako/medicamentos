@@ -61,7 +61,7 @@
 						<td>{{ $item->telefono_celular}}</td>
 						<td>{{ $item->edad}}</td>
 						<td>
-							@if($item->sexo = 'MASCULINO')
+							@if($item->sexo == 'MASCULINO')
 							M
 							@else
 							F

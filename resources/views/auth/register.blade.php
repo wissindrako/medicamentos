@@ -51,12 +51,6 @@
                     </div>
               </div>
             </div>
-            {{-- <div class="row">
-                <div class="col-sm-12 mysocial-login">
-                    <h3>...Visitanos en nuestra Pagina</h3>
-                    <h1><strong>minculturas.gob.bo</strong>.net</h1>
-                </div>
-            </div> --}}
         </div>
       </div>
  
