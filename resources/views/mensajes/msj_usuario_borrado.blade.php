@@ -17,7 +17,7 @@
 
               <div class="btn-group" style="margin-left:50px; " >
                      
-                      <a href="{{ url('listado_usuarios') }}" class="btn btn-info"    value=" "  > Listado Usuarios </a>
+                      <a href="{{ url('listado_personas') }}" class="btn btn-info"  value=" "  > Listado Personas </a>
              </div>
        
 

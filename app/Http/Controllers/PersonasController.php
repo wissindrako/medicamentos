@@ -271,7 +271,9 @@ class PersonasController extends Controller
             $pariente->delete();
         }
 
-        $historial->delete();
+        if($historial){
+            $historial->delete();
+        }
 
         if($persona->delete()){
             $usuario->revokeAllRoles();
